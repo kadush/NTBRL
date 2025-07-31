@@ -1,24 +1,25 @@
 <?php
 include('../includes/functions.php');
+require_once('../connection/db.php');
  $_SESSION['mfl'];
 
 if (isset($_GET['fid'])){
 		   echo $FacID = $_GET['fid'];
 	}   
-
+$year=date('Y');
 function getlogs($month,$year){
 	
  $sql="SELECT COUNT(*) FROM activitylog where activity='login' AND MONTH(tym)='$month' AND YEAR(tym)='$year'";	
-$query=mysql_query($sql) or die(mysql_error());
-$rs=mysql_fetch_row($query);
+$query=mysqli_query($dbConn,$sql) or die(mysqli_error($dbConn)());
+$rs=mysqli_fetch_row($query);
 return $rs[0]	;
 	
 	}
 function getlogout($month,$year){
 	
  $sql="SELECT COUNT(*) FROM activitylog where activity='logout' AND MONTH(tym)='$month' AND YEAR(tym)='$year'";	
-$query=mysql_query($sql) or die(mysql_error());
-$rs=mysql_fetch_row($query);
+$query=mysqli_query($dbConn,$sql) or die(mysqli_error($dbConn)());
+$rs=mysqli_fetch_row($query);
 return $rs[0]	;
 	
 	}
@@ -46,7 +47,7 @@ $startmonth =  1;
 		for ( $startmonth=1;$startmonth< 13;  $startmonth++)
   		{  
 		
-		$totallogin=getlogs($startmonth,2014);
+		$totallogin=getlogs($startmonth,$year);
 		
 		
 ?>
@@ -65,7 +66,7 @@ $startmonth =  1;
 		for ( $startmonth=1;$startmonth< 13;  $startmonth++)
   		{  
 		
-		$totallogout=getlogout($startmonth,2014);
+		$totallogout=getlogout($startmonth,$year);
 		
 		
 ?>

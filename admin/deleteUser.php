@@ -6,11 +6,10 @@ require_once('../connection/db.php');
 	$ID = $_GET['id'];
 	}
 
-mysql_select_db($database, $ntrl);
 $sql = "DELETE FROM user WHERE id ='$ID'" ;
 
-$delete = mysql_query($sql, $ntrl );
-$row = mysql_affected_rows();
+$delete = mysqli_query($dbConn,$sql);
+$row = mysqli_affected_rows($dbConn);
     if($delete){
         
 		@header("Location:userlog.php");

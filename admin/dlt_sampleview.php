@@ -7,14 +7,14 @@ include('Aheader.php');
 		$sampleID = $_GET['id'];
 	}
 
-mysql_select_db($database, $ntrl);
+mysqli_select_db($database, $ntrl);
 $query_rssample = "SELECT * FROM sample WHERE `cond` = 0 ";
-$rssample = mysql_query($query_rssample, $ntrl) or die(mysql_error());
-$row_rssample = mysql_fetch_assoc($rssample);
-$total = mysql_num_rows($rssample);
+$rssample = mysqli_query($dbConn,$query_rssample, $ntrl) or die(mysqli_error($dbConn)());
+$row_rssample = mysqli_fetch_assoc($rssample);
+$total = mysqli_num_rows($rssample);
 
-//$totalRows_rssample = mysql_num_rows($rssample);
-if  ($totalRows_rssample=mysql_num_rows($rssample)==0)
+//$totalRows_rssample = mysqli_num_rows($rssample);
+if  ($totalRows_rssample=mysqli_num_rows($rssample)==0)
 {
 	echo '<div class="errormsgbox">No fields to display</div>';
 	
@@ -71,7 +71,7 @@ if  ($totalRows_rssample=mysql_num_rows($rssample)==0)
 
 <td><a <?php echo "href='dlt_requestForm.php?id=" .urlencode($row_rssample['ID']) ."'";?>>Edit Request Form</a></td>   
     </tr>
-     <?php } while ($row_rssample = mysql_fetch_assoc($rssample)); ?> 
+     <?php } while ($row_rssample = mysqli_fetch_assoc($rssample)); ?> 
         </tbody>
 </table>
 			</div>
@@ -85,7 +85,7 @@ include("Asidebar.php");
 	</body>
 </html>
 <?php
-mysql_free_result($rssample);
+mysqli_free_result($rssample);
 ?>
 <?php
 include("../includes/footer.php");

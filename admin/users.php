@@ -2,16 +2,15 @@
 include('Aheader.php');
 require_once('../connection/db.php'); 
 
-mysql_select_db($database, $ntrl);
 $query_rsUsergroup = "SELECT * FROM usergroup ORDER BY usergroup.usergroupID ";
-$rsUsergroup = mysql_query($query_rsUsergroup, $ntrl) or die(mysql_error());
-$row_rsUsergroup = mysql_fetch_assoc($rsUsergroup);
-$totalRows_rsUsergroup = mysql_num_rows($rsUsergroup);
+$rsUsergroup = mysqli_query($dbConn,$query_rsUsergroup, $ntrl) or die(mysqli_error($dbConn)());
+$row_rsUsergroup = mysqli_fetch_assoc($rsUsergroup);
+$totalRows_rsUsergroup = mysqli_num_rows($rsUsergroup);
 
 $query_rsfacilitys = "SELECT facilitys.facilitycode, facilitys.name FROM facilitys ORDER BY facilitys.name";
-$rsfacilitys = mysql_query($query_rsfacilitys, $ntrl) or die(mysql_error());
-$row_rsfacilitys = mysql_fetch_assoc($rsfacilitys);
-$totalRows_rsfacilitys = mysql_num_rows($rsfacilitys);
+$rsfacilitys = mysqli_query($dbConn,$query_rsfacilitys) or die(mysqli_error($dbConn)());
+$row_rsfacilitys = mysqli_fetch_assoc($rsfacilitys);
+$totalRows_rsfacilitys = mysqli_num_rows($rsfacilitys);
 ?>
 
 
@@ -26,16 +25,16 @@ VALUES('$_POST[name]',
 '$_POST[username]',
 '$_POST[password]')";
 
-$retval = mysql_query( $sql, $ntrl );
+$retval = mysqli_query($dbConn, $sql);
 if(! $retval )
 {
-  die('Could not enter data: ' . mysql_error());
+  die('Could not enter data: ' . mysqli_error($dbConn)());
 }
 $suceessmsg= '<div class="success">User successfully added </div>';
    echo "<script>";
    echo "window.location.href='users.php?msg=$suceessmsg'";
    echo "</script>";
-mysql_close($ntrl);
+mysqli_close($ntrl);
 }
 
 ?>
@@ -108,11 +107,11 @@ do {
 ?>
       <option value="<?php echo $row_rsUsergroup['usergroupID']?>"><?php echo $row_rsUsergroup['groupName']; ?></option>
       <?php
-} while ($row_rsUsergroup = mysql_fetch_assoc($rsUsergroup));
-  $rows = mysql_num_rows($rsUsergroup);
+} while ($row_rsUsergroup = mysqli_fetch_assoc($rsUsergroup));
+  $rows = mysqli_num_rows($rsUsergroup);
   if($rows > 0) {
-      mysql_data_seek($rsUsergroup, 0);
-	  $row_rsUsergroup = mysql_fetch_assoc($rsUsergroup);
+      mysqli_data_seek($rsUsergroup, 0);
+	  $row_rsUsergroup = mysqli_fetch_assoc($rsUsergroup);
   }
 ?>
     </select>
@@ -135,11 +134,11 @@ do {
 ?>
       <option value="<?php echo $row_rsfacilitys['facilitycode']?>"><?php echo $row_rsfacilitys['name']; ?></option>
       <?php
-} while ($row_rsfacilitys = mysql_fetch_assoc($rsfacilitys));
-  $rows = mysql_num_rows($rsfacilitys);
+} while ($row_rsfacilitys = mysqli_fetch_assoc($rsfacilitys));
+  $rows = mysqli_num_rows($rsfacilitys);
   if($rows > 0) {
-      mysql_data_seek($rsfacilitys, 0);
-	  $row_rsfacilitys = mysql_fetch_assoc($rsfacilitys);
+      mysqli_data_seek($rsfacilitys, 0);
+	  $row_rsfacilitys = mysqli_fetch_assoc($rsfacilitys);
   }
 ?>
     </select></td

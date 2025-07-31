@@ -1,12 +1,12 @@
 <?php
-include('Aheader.php');
+include('Asidebar.php');
 require_once('../connection/db.php'); 
 
-mysql_select_db($database, $ntrl);
+mysqli_select_db($database, $ntrl);
 $query_rsUser = "SELECT user.id, user.name,user.password, usergroup.groupName FROM user,usergroup WHERE  user.category=usergroup.usergroupID ORDER BY user.id";
-$rsUser = mysql_query($query_rsUser, $ntrl) or die(mysql_error());
-$row_rsUser = mysql_fetch_array($rsUser);
-$totalRows_rsUser = mysql_num_rows($rsUser);
+$rsUser = mysqli_query($dbConn,$query_rsUser, $ntrl) or die(mysqli_error($dbConn)());
+$row_rsUser = mysqli_fetch_array($rsUser);
+$totalRows_rsUser = mysqli_num_rows($rsUser);
 ?>
 
 <link rel="stylesheet" type="text/css" href="../style.css" media="screen" />
@@ -53,7 +53,7 @@ $totalRows_rsUser = mysql_num_rows($rsUser);
                   <td><?php echo $row_rsUser[3]; ?></td>
                   
                 </tr>
-                <?php } while ($row_rsUser = mysql_fetch_array($rsUser)); ?>
+                <?php } while ($row_rsUser = mysqli_fetch_array($rsUser)); ?>
                 </tbody>
 </table>
         
@@ -61,7 +61,7 @@ $totalRows_rsUser = mysql_num_rows($rsUser);
            </div>
 		</div> 
 		<?php
-include("Asidebar.php");
+include("Aheader.php");
 ?>
 
 </div>

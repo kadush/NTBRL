@@ -4,12 +4,12 @@ include('Aheader.php');
 
 if ((isset($_POST["btnUpload"]) == "up")) {
 	//p@55w0rddv1
-	$connect = mysql_connect('localhost','root','');
+	$connect = mysqli_connect('localhost','root','');
 if (!$connect) { 
-    die('Could not connect to MySQL: ' . mysql_error()); 
+    die('Could not connect to mysqli: ' . mysqli_error($dbConn)()); 
 } 
 
-$cid =mysql_select_db('db_ntrl',$connect); 
+$cid =mysqli_select_db('db_ntrl',$connect); 
 $fieldseparator = ",";
 $lineseparator = "\n";
 $target_path = "../Csvfiles/";
@@ -148,7 +148,7 @@ foreach ($insert_array as $key => $value)
 
 $sql_insert;
  
-$query=mysql_query($fin, $connect );
+$query=mysqli_query($dbConn,$fin, $connect );
 
 //echo "Found a total of $lines records in this csv file.<br>";
  
@@ -159,7 +159,7 @@ echo "window.location.href='dlt_upload.php?msg=$suceessmsg'";
 echo "</script>";
 @header( 'Location: dlt_upload.php');
 
-mysql_close($connect);
+mysqli_close($connect);
 	
 	
 	

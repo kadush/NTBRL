@@ -1,5 +1,5 @@
 <?php 
-@require_once('../connection/db.php'); 
+require_once('../connection/db.php'); 
 include("Aheader.php");
 
 if (!function_exists("GetSQLValueString")) {
@@ -9,7 +9,7 @@ function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDe
     $theValue = get_magic_quotes_gpc() ? stripslashes($theValue) : $theValue;
   }
 
-  $theValue = function_exists("mysql_real_escape_string") ? mysql_real_escape_string($theValue) : mysql_escape_string($theValue);
+  $theValue = function_exists("mysqli_real_escape_string") ? mysqli_real_escape_string($dbConn,$theValue) : mysqli_escape_string($dbConn,$theValue);
 
   switch ($theType) {
     case "text":
@@ -95,10 +95,10 @@ $updateSQL = sprintf("UPDATE sample SET System_Name=%s, Exported_Date =%s, Repor
 					   GetSQLValueString($_POST['cond'], "text"),
 					   GetSQLValueString($_POST['num'], "int"));
 echo $updateSQL;
-mysql_select_db($database, $ntrl);
-$Result1 = mysql_query($updateSQL, $ntrl) or die(mysql_error());
+mysqli_select_db($database, $ntrl);
+$Result1 = mysqli_query($dbConn,$updateSQL, $ntrl) or die(mysqli_error($dbConn)());
 
- if (mysql_affected_rows($ntrl) == 1) { //If the Insert Query was successfull.
+ if (mysqli_affected_rows($ntrl) == 1) { //If the Insert Query was successfull.
  
  $success='<div class="success">Request Form data has been successfully saved </div>';
  
@@ -137,71 +137,71 @@ if (isset($_GET['id'])){
 		
 	}
 
-mysql_select_db($database, $ntrl);
+mysqli_select_db($database, $ntrl);
 $query_rssamp = "SELECT * FROM sample WHERE sample.ID=".$SampleID;
 
-$rssamp = mysql_query($query_rssamp, $ntrl) or die(mysql_error());
-$row_rssamp = mysql_fetch_assoc($rssamp);
-$totalRows_rssamp = mysql_num_rows($rssamp);
+$rssamp = mysqli_query($dbConn,$query_rssamp, $ntrl) or die(mysqli_error($dbConn)());
+$row_rssamp = mysqli_fetch_assoc($rssamp);
+$totalRows_rssamp = mysqli_num_rows($rssamp);
 
 
 ?>
 
 <?php
-mysql_select_db($database, $ntrl);
+mysqli_select_db($database, $ntrl);
 $query_rshiv_status = "SELECT hiv_status.id, hiv_status.status FROM hiv_status ORDER BY hiv_status.id";
-$rshiv_status = mysql_query($query_rshiv_status, $ntrl) or die(mysql_error());
-$row_rshiv_status = mysql_fetch_assoc($rshiv_status);
-$totalRows_rshiv_status = mysql_num_rows($rshiv_status);
+$rshiv_status = mysqli_query($dbConn,$query_rshiv_status, $ntrl) or die(mysqli_error($dbConn)());
+$row_rshiv_status = mysqli_fetch_assoc($rshiv_status);
+$totalRows_rshiv_status = mysqli_num_rows($rshiv_status);
 
 
-mysql_select_db($database, $ntrl);
+mysqli_select_db($database, $ntrl);
 $query_rscountys = "SELECT countys.ID, countys.name FROM countys ORDER BY countys.name";
-$rscountys = mysql_query($query_rscountys, $ntrl) or die(mysql_error());
-$row_rscountys = mysql_fetch_assoc($rscountys);
-$totalRows_rscountys = mysql_num_rows($rscountys);
+$rscountys = mysqli_query($dbConn,$query_rscountys, $ntrl) or die(mysqli_error($dbConn)());
+$row_rscountys = mysqli_fetch_assoc($rscountys);
+$totalRows_rscountys = mysqli_num_rows($rscountys);
 
-mysql_select_db($database, $ntrl);
+mysqli_select_db($database, $ntrl);
 $query_rsgenexpert_result = "SELECT genexpert_result.id, genexpert_result.mtb_indicator FROM genexpert_result ORDER BY genexpert_result.id";
-$rsgenexpert_result = mysql_query($query_rsgenexpert_result, $ntrl) or die(mysql_error());
-$row_rsgenexpert_result = mysql_fetch_assoc($rsgenexpert_result);
-$totalRows_rsgenexpert_result = mysql_num_rows($rsgenexpert_result);
+$rsgenexpert_result = mysqli_query($dbConn,$query_rsgenexpert_result, $ntrl) or die(mysqli_error($dbConn)());
+$row_rsgenexpert_result = mysqli_fetch_assoc($rsgenexpert_result);
+$totalRows_rsgenexpert_result = mysqli_num_rows($rsgenexpert_result);
 
-mysql_select_db($database, $ntrl);
+mysqli_select_db($database, $ntrl);
 $query_rsdistrict = "SELECT districts.ID, districts.name FROM districts ORDER BY districts.name";
-$rsdistrict = mysql_query($query_rsdistrict, $ntrl) or die(mysql_error());
-$row_rsdistrict = mysql_fetch_assoc($rsdistrict);
-$totalRows_rsdistrict = mysql_num_rows($rsdistrict);
+$rsdistrict = mysqli_query($dbConn,$query_rsdistrict, $ntrl) or die(mysqli_error($dbConn)());
+$row_rsdistrict = mysqli_fetch_assoc($rsdistrict);
+$totalRows_rsdistrict = mysqli_num_rows($rsdistrict);
 
-mysql_select_db($database, $ntrl);
+mysqli_select_db($database, $ntrl);
 $query_rsfacilitys = "SELECT facilitys.ID, facilitys.name FROM facilitys ORDER BY facilitys.name";
-$rsfacilitys = mysql_query($query_rsfacilitys, $ntrl) or die(mysql_error());
-$row_rsfacilitys = mysql_fetch_assoc($rsfacilitys);
-$totalRows_rsfacilitys = mysql_num_rows($rsfacilitys);
+$rsfacilitys = mysqli_query($dbConn,$query_rsfacilitys, $ntrl) or die(mysqli_error($dbConn)());
+$row_rsfacilitys = mysqli_fetch_assoc($rsfacilitys);
+$totalRows_rsfacilitys = mysqli_num_rows($rsfacilitys);
 
-mysql_select_db($database, $ntrl);
+mysqli_select_db($database, $ntrl);
 $query_rsexamination_required = "SELECT examination_required.id, examination_required.type FROM examination_required ORDER BY examination_required.id";
-$rsexamination_required = mysql_query($query_rsexamination_required, $ntrl) or die(mysql_error());
-$row_rsexamination_required = mysql_fetch_assoc($rsexamination_required);
-$totalRows_rsexamination_required = mysql_num_rows($rsexamination_required);
+$rsexamination_required = mysqli_query($dbConn,$query_rsexamination_required, $ntrl) or die(mysqli_error($dbConn)());
+$row_rsexamination_required = mysqli_fetch_assoc($rsexamination_required);
+$totalRows_rsexamination_required = mysqli_num_rows($rsexamination_required);
 
-mysql_select_db($database, $ntrl);
+mysqli_select_db($database, $ntrl);
 $query_rsgenexpert_interpretation = "SELECT genexpert_interpretation.id, genexpert_interpretation.findings FROM genexpert_interpretation ORDER BY genexpert_interpretation.id";
-$rsgenexpert_interpretation = mysql_query($query_rsgenexpert_interpretation, $ntrl) or die(mysql_error());
-$row_rsgenexpert_interpretation = mysql_fetch_assoc($rsgenexpert_interpretation);
-$totalRows_rsgenexpert_interpretation = mysql_num_rows($rsgenexpert_interpretation);
+$rsgenexpert_interpretation = mysqli_query($dbConn,$query_rsgenexpert_interpretation, $ntrl) or die(mysqli_error($dbConn)());
+$row_rsgenexpert_interpretation = mysqli_fetch_assoc($rsgenexpert_interpretation);
+$totalRows_rsgenexpert_interpretation = mysqli_num_rows($rsgenexpert_interpretation);
 
-mysql_select_db($database, $ntrl);
+mysqli_select_db($database, $ntrl);
 $query_rsregime = "SELECT regime.id, regime.type FROM regime ORDER BY regime.id";
-$rsregime = mysql_query($query_rsregime, $ntrl) or die(mysql_error());
-$row_rsregime = mysql_fetch_assoc($rsregime);
-$totalRows_rsregime = mysql_num_rows($rsregime);
+$rsregime = mysqli_query($dbConn,$query_rsregime, $ntrl) or die(mysqli_error($dbConn)());
+$row_rsregime = mysqli_fetch_assoc($rsregime);
+$totalRows_rsregime = mysqli_num_rows($rsregime);
 
-mysql_select_db($database, $ntrl);
+mysqli_select_db($database, $ntrl);
 $query_rstype_of_patient = "SELECT type_of_patient.id, type_of_patient.type FROM type_of_patient ORDER BY type_of_patient.id";
-$rstype_of_patient = mysql_query($query_rstype_of_patient, $ntrl) or die(mysql_error());
-$row_rstype_of_patient = mysql_fetch_assoc($rstype_of_patient);
-$totalRows_rstype_of_patient = mysql_num_rows($rstype_of_patient);
+$rstype_of_patient = mysqli_query($dbConn,$query_rstype_of_patient, $ntrl) or die(mysqli_error($dbConn)());
+$row_rstype_of_patient = mysqli_fetch_assoc($rstype_of_patient);
+$totalRows_rstype_of_patient = mysqli_num_rows($rstype_of_patient);
 ?>
 
 <link rel="stylesheet" type="text/css" href="../style.css" media="screen" />
@@ -429,11 +429,11 @@ do {
 ?>
       <option value="<?php echo $row_rsfacilitys['ID']?>"><?php echo $row_rsfacilitys['name']; ?></option>
       <?php
-} while ($row_rsfacilitys = mysql_fetch_assoc($rsfacilitys));
-  $rows = mysql_num_rows($rsfacilitys);
+} while ($row_rsfacilitys = mysqli_fetch_assoc($rsfacilitys));
+  $rows = mysqli_num_rows($rsfacilitys);
   if($rows > 0) {
-      mysql_data_seek($rsfacilitys, 0);
-	  $row_rsfacilitys = mysql_fetch_assoc($rsfacilitys);
+      mysqli_data_seek($rsfacilitys, 0);
+	  $row_rsfacilitys = mysqli_fetch_assoc($rsfacilitys);
   }
 ?>
     </select>
@@ -448,11 +448,11 @@ do {
 ?>
       <option value="<?php echo $row_rsfacilitys['ID']?>"><?php echo $row_rsfacilitys['name']; ?></option>
       <?php
-} while ($row_rsfacilitys = mysql_fetch_assoc($rsfacilitys));
-  $rows = mysql_num_rows($rsfacilitys);
+} while ($row_rsfacilitys = mysqli_fetch_assoc($rsfacilitys));
+  $rows = mysqli_num_rows($rsfacilitys);
   if($rows > 0) {
-      mysql_data_seek($rsfacilitys, 0);
-	  $row_rsfacilitys = mysql_fetch_assoc($rsfacilitys);
+      mysqli_data_seek($rsfacilitys, 0);
+	  $row_rsfacilitys = mysqli_fetch_assoc($rsfacilitys);
   }
 ?>
     </select>
@@ -495,11 +495,11 @@ do {
 ?>
       <option value="<?php echo $row_rshiv_status['status']?>"><?php echo $row_rshiv_status['status']; ?></option>
       <?php
-} while ($row_rshiv_status = mysql_fetch_assoc($rshiv_status));
-  $rows = mysql_num_rows($rshiv_status);
+} while ($row_rshiv_status = mysqli_fetch_assoc($rshiv_status));
+  $rows = mysqli_num_rows($rshiv_status);
   if($rows > 0) {
-      mysql_data_seek($rshiv_status, 0);
-	  $row_rshiv_status = mysql_fetch_assoc($rshiv_status);
+      mysqli_data_seek($rshiv_status, 0);
+	  $row_rshiv_status = mysqli_fetch_assoc($rshiv_status);
   }
 ?>
     </select>
@@ -513,11 +513,11 @@ do {
 ?>
       <option value="<?php echo $row_rsexamination_required['type']?>"><?php echo $row_rsexamination_required['type']; ?></option>
       <?php
-} while ($row_rsexamination_required = mysql_fetch_assoc($rsexamination_required));
-  $rows = mysql_num_rows($rsexamination_required);
+} while ($row_rsexamination_required = mysqli_fetch_assoc($rsexamination_required));
+  $rows = mysqli_num_rows($rsexamination_required);
   if($rows > 0) {
-      mysql_data_seek($rsexamination_required, 0);
-	  $row_rsexamination_required = mysql_fetch_assoc($rsexamination_required);
+      mysqli_data_seek($rsexamination_required, 0);
+	  $row_rsexamination_required = mysqli_fetch_assoc($rsexamination_required);
   }
 ?>
     </select>
@@ -532,11 +532,11 @@ do {
 ?>
       <option value="<?php echo $row_rstype_of_patient['type']?>"><?php echo $row_rstype_of_patient['type']; ?></option>
       <?php
-} while ($row_rstype_of_patient = mysql_fetch_assoc($rstype_of_patient));
-  $rows = mysql_num_rows($rstype_of_patient);
+} while ($row_rstype_of_patient = mysqli_fetch_assoc($rstype_of_patient));
+  $rows = mysqli_num_rows($rstype_of_patient);
   if($rows > 0) {
-      mysql_data_seek($rstype_of_patient, 0);
-	  $row_rstype_of_patient = mysql_fetch_assoc($rstype_of_patient);
+      mysqli_data_seek($rstype_of_patient, 0);
+	  $row_rstype_of_patient = mysqli_fetch_assoc($rstype_of_patient);
   }
 ?>
     </select>
@@ -557,11 +557,11 @@ do {
 ?>
       <option value="<?php echo $row_rsgenexpert_interpretation['findings']?>"><?php echo $row_rsgenexpert_interpretation['findings']; ?></option>
       <?php
-} while ($row_rsgenexpert_interpretation = mysql_fetch_assoc($rsgenexpert_interpretation));
-  $rows = mysql_num_rows($rsgenexpert_interpretation);
+} while ($row_rsgenexpert_interpretation = mysqli_fetch_assoc($rsgenexpert_interpretation));
+  $rows = mysqli_num_rows($rsgenexpert_interpretation);
   if($rows > 0) {
-      mysql_data_seek($rsgenexpert_interpretation, 0);
-	  $row_rsgenexpert_interpretation = mysql_fetch_assoc($rsgenexpert_interpretation);
+      mysqli_data_seek($rsgenexpert_interpretation, 0);
+	  $row_rsgenexpert_interpretation = mysqli_fetch_assoc($rsgenexpert_interpretation);
   }
 ?>
     </select>
@@ -577,11 +577,11 @@ do {
 ?>
       <option value="<?php echo $row_rsregime['type']?>"><?php echo $row_rsregime['type']; ?></option>
       <?php
-} while ($row_rsregime = mysql_fetch_assoc($rsregime));
-  $rows = mysql_num_rows($rsregime);
+} while ($row_rsregime = mysqli_fetch_assoc($rsregime));
+  $rows = mysqli_num_rows($rsregime);
   if($rows > 0) {
-      mysql_data_seek($rsregime, 0);
-	  $row_rsregime = mysql_fetch_assoc($rsregime);
+      mysqli_data_seek($rsregime, 0);
+	  $row_rsregime = mysqli_fetch_assoc($rsregime);
   }
 ?>
     </select>
@@ -608,11 +608,11 @@ do {
 ?>
       <option value="<?php echo $row_rsregime['type']?>"><?php echo $row_rsregime['type']; ?></option>
       <?php
-} while ($row_rsregime = mysql_fetch_assoc($rsregime));
-  $rows = mysql_num_rows($rsregime);
+} while ($row_rsregime = mysqli_fetch_assoc($rsregime));
+  $rows = mysqli_num_rows($rsregime);
   if($rows > 0) {
-      mysql_data_seek($rsregime, 0);
-	  $row_rsregime = mysql_fetch_assoc($rsregime);
+      mysqli_data_seek($rsregime, 0);
+	  $row_rsregime = mysqli_fetch_assoc($rsregime);
   }
 ?>
     </select></td>
@@ -661,6 +661,6 @@ do {
 <?php
 include("../includes/footer.php");
 
-@mysql_free_result($update);
-@mysql_free_result($rssamp);
+@mysqli_free_result($update);
+@mysqli_free_result($rssamp);
 ?>

@@ -6,13 +6,12 @@ if($_SESSION['nm']==""){
 @header("location:../dlt_login.php");
 }
 $sql1="SELECT distinct a.groupName,count(b.category) FROM usergroup a,user b where a.usergroupID=b.category group by category";
-$rs1 = mysql_query($sql1) or die(mysql_error());
-$rows1 = mysql_fetch_array($rs1);
+$rs1 = mysqli_query($dbConn,$sql1) or die(mysqli_error($dbConn)());
+$rows1 = mysqli_fetch_array($rs1);
 
-mysql_select_db($database, $ntrl);
 $query_rsUsergroup = "SELECT * FROM usergroup ORDER BY usergroup.usergroupID ";
-$rsUsergroup = mysql_query($query_rsUsergroup, $ntrl) or die(mysql_error());
-$row_rsUsergroup = mysql_fetch_array($rsUsergroup);
+$rsUsergroup = mysqli_query($dbConn,$query_rsUsergroup) or die(mysqli_error($dbConn)());
+$row_rsUsergroup = mysqli_fetch_array($rsUsergroup);
 
 
 ?>
@@ -256,7 +255,7 @@ $row_rsUsergroup = mysql_fetch_array($rsUsergroup);
 									<span class="badge badge-<?php  echo array_rand($class,1); ?>"><?php echo $rows1[1]; ?></span>
 									<?php echo $rows1[0]; ?>
 								</li>
-					<?php } while ($rows1 = mysql_fetch_array($rs1)); ?>			
+					<?php } while ($rows1 = mysqli_fetch_array($rs1)); ?>			
 			</div>
 				</div>
 				
