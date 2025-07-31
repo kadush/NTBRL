@@ -1,19 +1,13 @@
-<?php
-
-session_start();
-require_once('connection/db.php');
-error_reporting(0);
-
-?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="utf-8">
-    <title>TIBULIMS|Login</title>
-    <link rel="icon" href="assets/img/favicon.ico" type="image/x-icon" />
+    <title>TIBULims | Main</title>
+    <link rel="icon" href="img/favicon.ico" type="image/x-icon" />
     <style>
         /* Reset CSS */
+        
         html,
         body,
         div,
@@ -24,7 +18,7 @@ error_reporting(0);
         h1,
         h2,
         h3,
-        h3,
+        h4,
         h5,
         h6,
         p,
@@ -66,7 +60,7 @@ error_reporting(0);
         li,
         fieldset,
         form,
-        hubel,
+        label,
         legend,
         table,
         caption,
@@ -84,7 +78,7 @@ error_reporting(0);
             vertical-align: baseline;
             background: transparent;
         }
-
+        
         body {
             background: #DCDDDF;
             color: #000;
@@ -93,75 +87,75 @@ error_reporting(0);
             padding: 0;
             position: relative;
         }
-
+        
         h1 {
             font-size: 28px;
         }
-
+        
         h2 {
             font-size: 26px;
         }
-
+        
         h3 {
             font-size: 18px;
         }
-
-        h3 {
+        
+        h4 {
             font-size: 16px;
         }
-
+        
         h5 {
             font-size: 14px;
         }
-
+        
         h6 {
             font-size: 12px;
         }
-
+        
         h1,
         h2,
         h3,
-        h3,
+        h4,
         h5,
         h6 {
             color: #563D64;
         }
-
+        
         small {
             font-size: 10px;
         }
-
+        
         b,
         strong {
             font-weight: bold;
         }
-
+        
         a {
             text-decoration: none;
         }
-
+        
         a:hover {
             text-decoration: underline;
         }
-
+        
         .left {
             float: left;
         }
-
+        
         .right {
             float: right;
         }
-
+        
         .alignleft {
             float: left;
             margin-right: 15px;
         }
-
+        
         .alignright {
             float: right;
             margin-left: 15px;
         }
-
+        
         .clearfix:after,
         form:after {
             content: ".";
@@ -170,13 +164,13 @@ error_reporting(0);
             clear: both;
             visibility: hidden;
         }
-
+        
         .container {
             margin: 60px auto;
             position: relative;
             width: 900px;
         }
-
+        
         #content {
             background: #f9f9f9;
             background: -moz-linear-gradient(top, rgba(248, 248, 248, 1) 0%, rgba(249, 249, 249, 1) 100%);
@@ -184,7 +178,7 @@ error_reporting(0);
             background: -o-linear-gradient(top, rgba(248, 248, 248, 1) 0%, rgba(249, 249, 249, 1) 100%);
             background: -ms-linear-gradient(top, rgba(248, 248, 248, 1) 0%, rgba(249, 249, 249, 1) 100%);
             background: linear-gradient(top, rgba(248, 248, 248, 1) 0%, rgba(249, 249, 249, 1) 100%);
-            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#f8f8f8', endColorstr='#f9f9f9', GradientType=0);
+            filter: progid: DXImageTransform.Microsoft.gradient(startColorstr='#f8f8f8', endColorstr='#f9f9f9', GradientType=0);
             -webkit-box-shadow: 0 1px 0 #fff inset;
             -moz-box-shadow: 0 1px 0 #fff inset;
             -ms-box-shadow: 0 1px 0 #fff inset;
@@ -198,7 +192,7 @@ error_reporting(0);
             text-shadow: 0 1px 0 #fff;
             width: 400px;
         }
-
+        
         #content h1 {
             color: #7E7E7E;
             font: bold 25px Helvetica, Arial, sans-serif;
@@ -206,7 +200,7 @@ error_reporting(0);
             line-height: 20px;
             margin: 10px 0 30px;
         }
-
+        
         #content h1:before,
         #content h1:after {
             content: "";
@@ -215,7 +209,7 @@ error_reporting(0);
             top: 10px;
             width: 27%;
         }
-
+        
         #content h1:after {
             background: rgb(126, 126, 126);
             background: -moz-linear-gradient(left, rgba(126, 126, 126, 1) 0%, rgba(255, 255, 255, 1) 100%);
@@ -225,7 +219,7 @@ error_reporting(0);
             background: linear-gradient(left, rgba(126, 126, 126, 1) 0%, rgba(255, 255, 255, 1) 100%);
             right: 0;
         }
-
+        
         #content h1:before {
             background: rgb(126, 126, 126);
             background: -moz-linear-gradient(right, rgba(126, 126, 126, 1) 0%, rgba(255, 255, 255, 1) 100%);
@@ -235,7 +229,7 @@ error_reporting(0);
             background: linear-gradient(right, rgba(126, 126, 126, 1) 0%, rgba(255, 255, 255, 1) 100%);
             left: 0;
         }
-
+        
         #content:after,
         #content:before {
             background: #f9f9f9;
@@ -244,7 +238,7 @@ error_reporting(0);
             background: -o-linear-gradient(top, rgba(248, 248, 248, 1) 0%, rgba(249, 249, 249, 1) 100%);
             background: -ms-linear-gradient(top, rgba(248, 248, 248, 1) 0%, rgba(249, 249, 249, 1) 100%);
             background: linear-gradient(top, rgba(248, 248, 248, 1) 0%, rgba(249, 249, 249, 1) 100%);
-            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#f8f8f8', endColorstr='#f9f9f9', GradientType=0);
+            filter: progid: DXImageTransform.Microsoft.gradient(startColorstr='#f8f8f8', endColorstr='#f9f9f9', GradientType=0);
             border: 1px solid #c4c6ca;
             content: "";
             display: block;
@@ -253,7 +247,7 @@ error_reporting(0);
             position: absolute;
             width: 100%;
         }
-
+        
         #content:after {
             -webkit-transform: rotate(2deg);
             -moz-transform: rotate(2deg);
@@ -263,7 +257,7 @@ error_reporting(0);
             top: 0;
             z-index: -1;
         }
-
+        
         #content:before {
             -webkit-transform: rotate(-3deg);
             -moz-transform: rotate(-3deg);
@@ -273,12 +267,12 @@ error_reporting(0);
             top: 0;
             z-index: -2;
         }
-
+        
         #content form {
             margin: 0 20px;
             position: relative
         }
-
+        
         #content form input[type="text"],
         #content form input[type="password"] {
             -webkit-border-radius: 3px;
@@ -296,16 +290,15 @@ error_reporting(0);
             -ms-transition: all 0.5s ease;
             -o-transition: all 0.5s ease;
             transition: all 0.5s ease;
-            background: #eae7e7 url(../assets/img/8bcLQqF.png) no-repeat;
+            background: #eae7e7 url(img/8bcLQqF.png) no-repeat;
             border: 1px solid #c8c8c8;
             color: #777;
             font: 13px Helvetica, Arial, sans-serif;
             margin: 0 0 10px;
             padding: 15px 10px 15px 40px;
             width: 80%;
-
         }
-
+        
         #content form input[type="text"]:focus,
         #content form input[type="password"]:focus {
             -webkit-box-shadow: 0 0 2px #ed1c24 inset;
@@ -317,15 +310,15 @@ error_reporting(0);
             border: 1px solid #ed1c24;
             outline: none;
         }
-
+        
         #username {
             background-position: 10px 10px !important
         }
-
+        
         #password {
             background-position: 10px -53px !important
         }
-
+        
         #content form input[type="submit"] {
             background: #9CC;
             background: -moz-linear-gradient(top, rgba(254, 231, 154, 1) 0%, rgba(254, 193, 81, 1) 100%);
@@ -333,7 +326,7 @@ error_reporting(0);
             background: -o-linear-gradient(top, rgba(254, 231, 154, 1) 0%, rgba(254, 193, 81, 1) 100%);
             background: -ms-linear-gradient(top, rgba(254, 231, 154, 1) 0%, rgba(254, 193, 81, 1) 100%);
             background: linear-gradient(top, rgba(254, 231, 154, 1) 0%, rgba(254, 193, 81, 1) 100%);
-            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fee79a', endColorstr='#fec151', GradientType=0);
+            filter: progid: DXImageTransform.Microsoft.gradient(startColorstr='#fee79a', endColorstr='#fec151', GradientType=0);
             -webkit-border-radius: 30px;
             -moz-border-radius: 30px;
             -ms-border-radius: 30px;
@@ -353,9 +346,9 @@ error_reporting(0);
             margin: 20px 0 35px 40px;
             position: relative;
             text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-            width: 133px;
+            width: 120px;
         }
-
+        
         #content form input[type="submit"]:hover {
             background: #9CC;
             background: -moz-linear-gradient(top, rgba(254, 193, 81, 1) 0%, rgba(254, 231, 154, 1) 100%);
@@ -363,10 +356,9 @@ error_reporting(0);
             background: -o-linear-gradient(top, rgba(254, 193, 81, 1) 0%, rgba(254, 231, 154, 1) 100%);
             background: -ms-linear-gradient(top, rgba(254, 193, 81, 1) 0%, rgba(254, 231, 154, 1) 100%);
             background: linear-gradient(top, rgba(254, 193, 81, 1) 0%, rgba(254, 231, 154, 1) 100%);
-            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fec151', endColorstr='#fee79a', GradientType=0);
-
+            filter: progid: DXImageTransform.Microsoft.gradient(startColorstr='#fec151', endColorstr='#fee79a', GradientType=0);
         }
-
+        
         #content form div a {
             color: #004a80;
             float: right;
@@ -374,7 +366,7 @@ error_reporting(0);
             margin: 30px 15px 0 0;
             text-decoration: underline;
         }
-
+        
         .button {
             background: #9CC;
             background: -moz-linear-gradient(top, rgba(247, 249, 250, 1) 0%, rgba(240, 240, 240, 1) 100%);
@@ -382,7 +374,7 @@ error_reporting(0);
             background: -o-linear-gradient(top, rgba(247, 249, 250, 1) 0%, rgba(240, 240, 240, 1) 100%);
             background: -ms-linear-gradient(top, rgba(247, 249, 250, 1) 0%, rgba(240, 240, 240, 1) 100%);
             background: linear-gradient(top, rgba(247, 249, 250, 1) 0%, rgba(240, 240, 240, 1) 100%);
-            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#f7f9fa', endColorstr='#f0f0f0', GradientType=0);
+            filter: progid: DXImageTransform.Microsoft.gradient(startColorstr='#f7f9fa', endColorstr='#f0f0f0', GradientType=0);
             -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
             -moz-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
             -ms-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
@@ -396,9 +388,9 @@ error_reporting(0);
             border-top: 1px solid #CFD5D9;
             padding: 15px 0;
         }
-
+        
         .button a {
-            background: url(../assets/img/8bcLQqF.png) 0 -112px no-repeat;
+            background: url(img/8bcLQqF.png) 0 -112px no-repeat;
             color: #7E7E7E;
             font-size: 17px;
             padding: 2px 0 2px 40px;
@@ -409,98 +401,90 @@ error_reporting(0);
             -o-transition: all 0.3s ease;
             transition: all 0.3s ease;
         }
-
+        
         .button a:hover {
             background-position: 0 -135px;
             color: #00aeef;
         }
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/css/style2.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="assets/css/style1.css" media="screen" />
-    <script src="assets/neon/neon-x/assets/js/jquery-1.10.2.min.js"></script>
-    <link rel="stylesheet" href="assets/neon/neon-x/assets/js/jquery-ui/css/no-theme/jquery-ui-1.10.3.custom.min.css" id="style-resource-1">
-    <link rel="stylesheet" href="assets/neon/neon-x/assets/css/font-icons/entypo/css/entypo.css" id="style-resource-2">
-    <link rel="stylesheet" href="assets/neon/neon-x/assets/css/font-icons/entypo/css/animation.css" id="style-resource-3">
-    <link rel="stylesheet" href="assets/neon/neon-x/assets/css/neon.css" id="style-resource-5">
-    <link rel="stylesheet" href="assets/neon/neon-x/assets/css/custom.css" id="style-resource-6">
+    <link rel="stylesheet" type="text/css" href="css/style2.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="css/style1.css" media="screen" />
 
 </head>
+
 <body>
-    <div id="site-wrapper">
+    <div id="site-wrapper" align="center">
+
         <div id="header">
-            <div id="top">
-                <div align="center" id="logo">
-                    <img width="600px" height="80px" src="assets/img/Tibu-Lims.png" class="img-responsive" />
-                    <!-- <img align="right" src="img/gx.jpg" alt="" height="65px"/> -->
-                </div>
+
+            <div id="top" align="center">
+                <table style="width:100%;" border='0'>
+                    <tr>
+                        <td style="width:20%;"><img src="img/MOH.png" style="width:100px; height:100px; "></img>
+                        </td>
+                        <td style="width:60%; text-align: center ;"><span class='box-header'>
+                        <img src="../cad4tb/assets/img/tibulimsh.png" style="width:380px; height:100px;" ></img>
+                            </span></td>
+                        <td style="width:20%; "><img src="img/ntp.png" style="width:100px; height:100px;float:right;">
+                        </td>
+                    </tr>
+                    <!-- <tr>
+                        <td style="width:20%;"><img src="../cad4tb/assets/img/Tibu-Lims.png" style="width:1180px; height:140px;" ></img>
+                       
+                    </tr> -->
+                </table>
             </div>
-            <center>
-                <div class="container">
-                    <table border='0' style="width:100%;margin-left:auto;margin-right:auto;">
-                        <tr>
-                            <td style="width:25%;text-align: right; padding-right: 10%;">
-                                <a href='http://tibulims.dltld.or.ke/ntbrl/login'><img width="133px" height="133px" src="img/gx.jfif" class='box-inner'></img></a>
 
-                                <a href='http://tibulims.dltld.or.ke/ntbrl/login'>
-                                    <h3>Genexpert Portal</h3>
-                                </a>
-                            </td>
-                            <td style="text-align: left;width:25%;padding-left: 10%;">
-                                <a href='http://tibulims.dltld.or.ke/ntbrl/login'><img width="133px" height="133px" src="img/truenat.png" class='box-inner'></img></a>
+            <table border='0' style="width:100%;margin-left:auto;margin-right:auto;">
+                <tr>
+                    <td style="width:25%;text-align: right; padding-right: 10%;">
+                        <a href='http://tibulims.dltld.or.ke/ntbrl/login'><img src="img/gx.jfif" class='box-inner'></img>
+                   
+                        <a href='http://tibulims.dltld.or.ke/ntbrl/login'>
+                            <h1>Genexpert Portal</h1>
+                        </a>
+                    </td>
+                    <td style="text-align: left;width:25%;padding-left: 10%;">
+                        <a href='http://tibulims.dltld.or.ke/ntbrl/login'><img width="200px" height="233px" src="img/truenat.png" class='box-inner'></img>
+                   
+                        <a href='http://tibulims.dltld.or.ke/ntbrl/login'>
+                            <h1>TrueNat Portal</h1>
+                        </a>
+                    </td>
+                  
+                </tr>
+                <tr>
+                    <td style="width:25%;text-align: right;padding-right: 10%;">
+                        <a href='http://tibulims.dltld.or.ke/EQA/'><img src="img/microscope.png" class='box-inner'></img>
+                   
+                        <a href='http://tibulims.dltld.or.ke/EQA/'>
+                            <h1>AFB Portal(SCMLT)</h1>
+                        </a>
+                    </td>
+                    <td style="text-align: left;width:25%;padding-left: 10%;">
+                        <a href='http://tibulims.dltld.or.ke/cad4tb/'><img  width="200px" height="210px" src="../cad4tb/assets/img/cxr.JPG" class='box-inner'></img>
+                    
+                        <a href='http://tibulims.dltld.or.ke/cad4tb/'>
+                            <h1>CAD4TB Portal</h1>
+                        </a>
+                    </td>                   
+                </tr>
 
-                                <a href='http://tibulims.dltld.or.ke/ntbrl/login'>
-                                    <h3>TrueNat Portal</h3>
-                                </a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="width:25%;text-align: right;padding-right: 10%;">
-                                <a href='http://tibulims.dltld.or.ke/EQA/'><img width="133px" height="133px" src="img/microscope.png" class='box-inner'></img></a>
 
-                                <a href='http://tibulims.dltld.or.ke/EQA/'>
-                                    <h3>AFB Portal(SCMLT)</h3>
-                                </a>
-                            </td>
-                            <td style="text-align: left;width:25%;padding-left: 10%;">
-                                <a href='http://tibulims.dltld.or.ke/cad4tb/'><img width="133px" height="133px" src="img/cxr.JPG" class='box-inner'></img></a>
-
-                                <a href='http://tibulims.dltld.or.ke/cad4tb/'>
-                                    <h3>CAD4TB Portal</h3>
-                                </a>
-                            </td>
-                        </tr>
-                    </table>
-                </div><!-- container -->
-            </center>
+            </table>
             <div id="footer">
+                <div class="left">&nbsp;</div>
+
+                <div align="center" style="font-family:'Times New Roman', Times, serif;font-size:12px"> &copy;
+                    <?php echo @date('Y'); ?> GOK
+                </div>
+
+                <div class="clearer">&nbsp;</div>
 
             </div>
 
         </div>
     </div>
-    <link rel="stylesheet" href="assets/neon/neon-x/assets/js/select2/select2-bootstrap.css" id="style-resource-1">
-    <link rel="stylesheet" href="assets/neon/neon-x/assets/js/select2/select2.css" id="style-resource-2">
-
-    <script src="assets/neon/neon-x/assets/js/jquery.inputmask.bundle.min.js" id="script-resource-7"></script>
-    <script src="assets/neon/neon-x/assets/js/gsap/main-gsap.js" id="script-resource-1"></script>
-    <script src="assets/neon/neon-x/assets/js/jquery-ui/js/jquery-ui-1.10.3.minimal.min.js" id="script-resource-2"></script>
-    <script src="assets/neon/neon-x/assets/js/bootstrap.min.js" id="script-resource-3"></script>
-    <script src="assets/neon/neon-x/assets/js/joinable.js" id="script-resource-4"></script>
-    <script src="assets/neon/neon-x/assets/js/resizeable.js" id="script-resource-5"></script>
-    <script src="assets/neon/neon-x/assets/js/neon-api.js" id="script-resource-6"></script>
-    <script src="assets/neon/neon-x/assets/js/jquery.dataTables.min.js" id="script-resource-7"></script>
-    <script src="assets/neon/neon-x/assets/js/dataTables.bootstrap.js" id="script-resource-8"></script>
-    <script src="assets/neon/neon-x/assets/js/select2/select2.min.js" id="script-resource-9"></script>
-    <script src="assets/neon/neon-x/assets/js/neon-chat.js" id="script-resource-10"></script>
-    <script src="assets/neon/neon-x/assets/js/neon-custom.js" id="script-resource-11"></script>
-    <script src="assets/neon/neon-x/assets/js/neon-demo.js" id="script-resource-12"></script>
-    <script src="assets/neon/neon-x/assets/js/toastr.js" id="script-resource-7"></script>
-    <script src="assets/neon/neon-x/assets/js/bootstrap-datepicker.js" id="script-resource-11"></script>
-    <script type="text/javascript" src="assets/js/jquery-multi-select/js/jquery.multi-select.js"></script>
-
-    <script src="assets/js/select-init.js"></script>
-
-
 </body>
 
 </html>

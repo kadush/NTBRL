@@ -1,0 +1,190 @@
+mfl,facility,sub_county,county
+10233,Gatundu District Hospital,Gatundu South,Kiambu
+10485,Karatina District Hospital,Mathira East,Nyeri
+10520,Kerugoya District Hospital,Kirinyaga Central,Kirinyaga
+10539,Kiambu County Referal Hospital,Kiambu Town,Kiambu
+10602,Kijabe (AIC) Hospital,Lari,Kiambu
+10603,Kikuyu (PCEA) Hospital,Kikuyu,Kiambu
+10609,Kimbimbi Sub-District Hospital,Kirinyaga South,Kirinyaga
+10686,Maragua District Hospital,muranga south,Muranga
+10777,Murang'a District Hospital,Kiharu,Muranga
+10829,Ndaragwa Health Centre,Ndaragwa,Nyandarua
+10887,North Kinangop Catholic Hospital,Kinangop,Nyandarua
+10890,Nyahururu District Hospital,Laikipia West,Laikipia
+10903,Nyeri Provincial General Hospital (PGH),Nyeri Central,Nyeri
+10916,JM Kariuki Memorial County Referral Hospital,Olkalou,Nyandarua
+10973,Ruiru Sub-County Hospital,Ruiru,Kiambu
+10994,Sagana Sub-County Hospital,Kirinyaga West,Kirinyaga
+11094,Thika Level 5 Hospital,Thika Town,Kiambu
+11104,Tigoni District Hospital,Limuru,Kiambu
+11258,Bomu Medical Hospital (Changamwe),Changamwe,Mombasa
+11273,Cdc Ganjoni Dispensary,Mvita,Mombasa
+11289,Coast General Teaching and Referral Hospital,Mvita,Mombasa
+11395,Shimo-La Tewa Health Centre (GK Prison),Kisauni,Mombasa
+11411,Hola District Hospital,Galole,Tana River
+11474,Kilifi County Hospital,Kilifi North,Kilifi
+11480,Kinango Sub County Hospital,Kinango,Kwale
+11507,Kwale District Hospital,Matuga,Kwale
+11512,Lamu County Referral Hospital,Lamu West,Lamu
+11522,Likoni District Hospital,Likoni,Mombasa
+11555,Malindi District Hospital,Malindi,Kilifi
+11566,Mariakani District Hospital,Kaloleni,Kilifi
+11641,Moi District Hospital Voi,Voi,Taita Taveta
+11655,Msambweni County Referral Hospital,Msambweni,Kwale
+11669,Mtongwe (MCM) Dispensary,Likoni,Mombasa
+11740,Port Reitz Sub County Hospital,Changamwe,Mombasa
+11840,Taveta District Hospital,Taveta,Taita Taveta
+11861,Tudor sub-county hospital,Mvita,Mombasa
+11970,Chogoria (PCEA) Hospital,Mwimbi,Tharaka Nithi
+11973,Chuka  County Refferal Hospital,Chuka,Tharaka Nithi
+12004,Embu Provincial General Hospital,Manyatta,Embu
+12029,Garbatulla District Hospital,Garbatulla,Isiolo
+12094,Isiolo District Hospital,Isiolo,Isiolo
+12177,Kangundo Sub county Hospital,Kangundo,Machakos
+12181,Kanyakine District Hospital,Imenti South,Meru
+12291,Kibwezi Sub County Hospital,Kibwezi East,Makueni
+12366,Kitui County Referral Hospital,Kitui Central,Kitui
+12438,Machakos County Referral Hospital,Machakos,Machakos
+12455,Makindu Sub-County Hospital,Kibwezi West,Makueni
+12457,Makueni County Referral Hospital,Makueni,Makueni
+12472,Marsabit County Referral Hospital,Saku,Marsabit
+12488,Matuu District Hospital,Yatta,Machakos
+12508,Mbooni Sub County Hospital,Mbooni,Makueni
+12516,Meru Teaching & Referral Hospital,Imenti North,Meru
+12544,Moyale Sub county Referral  Hospital,Moyale,Marsabit
+12603,Mutomo Sub County Hospital,Kitui South,Kitui
+12605,Mutuati Sub-District Hospital,Igembe North,Meru
+12618,Mwala Subcounty Hospital,Mwala,Machakos
+12626,Mwingi Level IV Hospital,Mwingi Central,Kitui
+12684,Nyambene District Hospital,Igembe South,Meru
+12719,Runyenjes District Hospital,Runyenjes,Embu
+12795,Tharaka District Hospital,Tharaka South,Tharaka Nithi
+12878,Bahati Clinic,Makadara,Nairobi
+12905,Coptic Hospital (Ngong Road),Dagoretti North,Nairobi
+12950,Gertrudes Childrens Hospital,Westlands,Nairobi
+13023,Kenyatta National Hospital,Kibra,Nairobi
+13030,Kibera South Health Centre,Langata,Nairobi
+13076,Mathari Hospital,Starehe,Nairobi
+13077,Mathare North Health Centre,Ruaraka,Nairobi
+13080,Mbagathi District Hospital,Kibra,Nairobi
+13087,Memorial Hospital,Kibra,Nairobi
+13131,Nyumbani Diagnostic Laboratory and Medical Clinic,Langata,Nairobi
+13161,Nairobi Remand Prison Health Centre,Starehe,Nairobi
+13163,Rhodes Chest Clinic,Starehe,Nairobi
+13165,Riruta Health Centre,Dagoretti North,Nairobi
+13220,EDARP Donholm Clinic,Embakasi East,Nairobi
+13346,Garissa County Referral Hospital,Garissa,Garissa
+13368,Ifo Hospital,Dadaab,Garissa
+13402,Mandera County Refferal Hospital,Mandera East,Mandera
+13452,Wajir County Referral Hospital,Wajir East,Wajir
+13468,Ahero County Hospital,Nyando,Kisumu
+13476,Ambira Sub-County Hospital,Ugunja,Siaya
+13507,Bondo County Referral  Hospital,Bondo,Siaya
+13528,Chulaimbo County Hospital,Kisumu West,Kisumu
+13540,Ekerenyo Sub-District Hospital,Nyamira North,Nyamira
+13594,Gucha Sub County Referral Hospital,Bomachoge Chache,Kisii
+13608,Homa Bay County Teaching and Referral Hospital,Homa Bay Town,Homa Bay
+13638,Kabondo Sub-County  Hospital,Kabondo Kasipul,Homa Bay
+13668,Kendu Sub-District Hospital,Karachuonyo,Homa Bay
+13678,Masaba District Hospital,Masaba North,Nyamira
+13680,Keumbu Sub County Hospital,Nyaribari Chache,Kisii
+13703,Kisii Teaching And Referral Hospital (Level 6),Kitutu Chache South,Kisii
+13704,Kisumu County Hospital,Kisumu Central,Kisumu
+13714,Kombewa County  Referral Hospital,Seme,Kisumu
+13726,Kehancha Sub County Hospital,Kuria West,Migori
+13745,Macalder Sub-County Hospital,Nyatike,Migori
+13747,Madiany Sub County  Hospital,Rarieda,Siaya
+13751,Magina Health Centre,Ndhiwa,Homa Bay
+13766,Manga District Hospital,Manga,Nyamira
+13798,Mbita Sub-County Hospital,Mbita,Homa Bay
+13805,Migori County Referral Hospital,Suna East,Migori
+13831,Muhoroni County Hospital,Muhoroni,Kisumu
+13841,Ndhiwa Sub-District Hospital,Ndhiwa,Homa Bay
+13912,Nyamira County Refferal Hospital,Nyamira,Nyamira
+13921,Nyakach County Hospital,Nyakach,Kisumu
+13939,Jaramogi Oginga Odinga Teaching & Referral Hospital,Kisumu Central,Kisumu
+14011,Pala Health Centre,Ndhiwa,Homa Bay
+14022,Rachuonyo District Hospital,Rachuonyo South,Homa Bay
+14036,Rangwe Sub-District Hospital,Rangwe,Homa Bay
+14058,Rongo Sub County Hospital,Rongo,Migori
+14080,Siaya County Referral Hospital,Alego Usonga,Siaya
+14130,Suba Sub-Couty Hospital,Suba South,Homa Bay
+14175,Yala Sub County Hospital,Gem,Siaya
+14179,Nandi Hills District Hospital,Nandi Hills,Nandi
+14224,Bahati District Hospital,Nakuru North,Nakuru
+14244,Base Medical Centre,Laikipia East,Laikipia
+14330,Chepareria Sub District Hospital,Pokot South,West Pokot
+14346,Chepkorio Health Centre,Keiyo South,Elgeyo Marakwet
+14379,Cherangany Sub County Hospital,Cherangany,Trans Nzoia
+14432,Eldama Ravine District Hospital,Koibatek,Baringo
+14555,Huruma District Hospital,Turbo,Uasin Gishu
+14579,Kaapoka Health Centre,Turkana West,Turkana
+14586,Iten County Referral Hospital,Keiyo North,Elgeyo Marakwet
+14607,Baringo County Refferal Hospital,Baringo Central,Baringo
+14634,Kacheliba District Hospital,Pokot North,West Pokot
+14652,Kajiado County Referral Hospital,Kajiado Central,Kajiado
+14701,Kapenguria County Referral Hospital,West Pokot,West Pokot
+14706,Kapkatet District Hospital,Bureti,Kericho
+14749,Kapsabet County Referral Hospital,Emgwen,Nandi
+14767,Kapsowar (AIC) Hospital,Marakwet West,Elgeyo Marakwet
+14818,Katilu Health Centre,Turkana South,Turkana
+14831,Kericho District Hospital,Ainamoi,Kericho
+14872,Kiminini Cottage Hospital,Kiminini,Trans Nzoia
+14947,Kitale County Hospital,Kiminini,Trans Nzoia
+15049,Lodwar County Referral Hospital,Turkana Central,Turkana
+15051,Loitokitok Sub County Hospital,Loitokitok,Kajiado
+15062,Lokitaung Sub County Hospital,Turkana North,Turkana
+15074,Londiani District Hospital,Kipkelion East,Kericho
+15077,Longisa County Referral  Hospital,Bomet East,Bomet
+15081,Lopiding Sub County Hospital,Turkana West,Turkana
+15126,Maralal District Hospital,Samburu Central,Samburu
+15138,Marigat Sub District Hospital,Marigat,Baringo
+15204,Moi Teaching Refferal Hospital,Ainabkoi,Uasin Gishu
+15212,Molo District Hospital,Molo,Nakuru
+15229,Mosoriot Sub County Hospital,Chesumei,Nandi
+15280,Naivasha District Hospital,Naivasha,Nakuru
+15288,Nakuru Provincial General Hospital,Nakuru West,Nakuru
+15305,Nanyuki District Hospital,Laikipia East,Laikipia
+15311,Narok County Referral Hospital,Narok North,Narok
+15398,Olenguruone Sub-District Hospital,Kuresoi South,Nakuru
+15434,Oltepesi Dispensary,Kajiado West,Kajiado
+15564,Sigor Sub District Hospital,Pokot Central,West Pokot
+15652,St Mary Health Centre (Kiserian),Kajiado West,Kajiado
+15719,Tenwek Mission Hospital,Bomet Central,Bomet
+15739,Transmara West Sub County Hospital,Transmara West,Narok
+15768,Wamba Health Centre,Samburu East,Samburu
+15787,Zam Zam Medical Services,Kajiado North,Kajiado
+15828,Bungoma County Referral Hospital,Kanduyi,Bungoma
+15834,Busia County Referral Hospital,Matayos,Busia
+15836,Butere Sub County Hospital,Butere,Kakamega
+15876,Emuhaya Sub County Referral Hospital,Luanda,Vihiga
+15894,Hamisi Sub County Hospital,Hamisi,Vihiga
+15915,Kakamega County General Hospital,Lurambi,Kakamega
+15939,Khunyangu Sub County Hospital,Butula,Busia
+15950,Kimilili Subcounty Hospital,Kimilili,Bungoma
+15969,Lumakanda Sub County Hospital,Lugari,Kakamega
+15996,Malava Sub County Hospital,Malava,Kakamega
+16061,Naitiri Sub-County Hospital,Tongaren,Bungoma
+16091,Port Victoria Hospital,Bunyala,Busia
+16141,St Mary's Hospital (Mumias),Mumias West,Kakamega
+16150,Teso  North Sub county Hospital,Teso North,Busia
+16157,Vihiga County Referral Hospital,Vihiga,Vihiga
+16161,Webuye Hospital,Webuye West,Bungoma
+16215,Catholic Hospital Laisamis,Laisamis,Marsabit
+16234,Miathene District Hospital,Tigania West,Meru
+16464,Ishiara Sub-District Hospital,Mbeere North,Embu
+17065,Kangeta G K Prison Dispensary,Igembe Central,Meru
+17411,Mama Lucy Kibaki Hospital - Embakasi,Embakasi West,Nairobi
+17485,Moi Baracks,Turbo,Uasin Gishu
+17529,Matibabu Ukwala Clinic,Ugenya,Siaya
+17979,Shalom Community Hospital (Athi River),Athi River,Machakos
+18009,Algadir Medical Centre,Nakuru East,Nakuru
+18210,Mlaleo Health Centre (MOH),Nyali,Mombasa
+22222,Kemri CDC - Kisian,Kisumu West,Kisumu
+18485,Ruaraka Uhai Neema Hospital,Ruaraka,Nairobi
+18799,IFO 2 Hospital,Dadaab,Garissa
+21316,Lokori Health Centre,Turkana East,Turkana
+22211,KEMRI Walter Reed Project Kericho,Ainamoi,Kericho
+22215,Natukobenyo Health Centre,Turkana West,Turkana
+10940,Plainsview Nursing Home,Ruiru,Kiambu
+136080,Homa Bay County Teaching and Referral Hospital-IPD,Homa Bay Town,Homa Bay

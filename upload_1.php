@@ -85,7 +85,7 @@ if ($arr['password'] != '80SHe5MF7gM73t4aog5Q') {
 
 		//checks if there is such a sample using lab no
 
-		$sql = "SELECT ID as recordId, Refacility as referredFrom,op_no as outpatientNumber,op_no as inpatientNumber,regno as referringSiteNumber,fullname as patientName, gender as gender, age as age,ageb as ageType, mobile as patientCell,address as patientAddress,pat_type as caseDefinition,smear as smear,h_status as hiv,exam_req as examinationRequired,d_email as dtlcEmail,c_no as clinicianCell,c_name as clinicianName,c_email as clinicianEmail FROM samples_ATR where lab_no='$sampleid' LIMIT 1";
+		$sql = "SELECT ID as recordId, Refacility as referredFrom,op_no as outpatientNumber,op_no as inpatientNumber,regno as referringSiteNumber,fullname as patientName, gender as gender, age as age,ageb as ageType, mobile as patientCell,address as patientAddress,pat_type as caseDefinition,smear as smear,h_status as hiv,exam_req as examinationRequired,d_email as dtlcEmail,c_no as clinicianCell,c_name as clinicianName,c_email as clinicianEmail FROM sample1 where lab_no='$sampleid' LIMIT 1";
 		$checkSample = mysqli_query($dbConn, $sql) or die(mysqli_error($dbConn));
 		$row_rsFinC = mysqli_fetch_assoc($checkSample);
 
@@ -165,22 +165,20 @@ if ($arr['password'] != '80SHe5MF7gM73t4aog5Q') {
 				$pname = urlencode($row_rssamp['fullname']);
 				$mtb = urlencode($row_rssamp['Test_Result']);
 				$mtbrif = urlencode($row_rssamp['mtbRif']);
-				$fname = $row_rssamp['fname'];
-				$fname1 = urlencode($row_rssamp['fname']);
-				$tname = $row_rssamp['ref_fname'];
-				$tname1 = urlencode($row_rssamp['ref_fname']);
+				$fcode = $row_rssamp['Refacility'];
+				$tcode = $row_rssamp['facility'];
 
-				// $q = "SELECT facilityname as fname FROM facility_view WHERE facilitycode='$fcode'";
-				// $rs = mysqli_query($dbConn, $q) or die(mysqli_error($dbConn));
-				// $r = mysqli_fetch_assoc($rs);
-				// $fname = urlencode($r['fname']);
-				// $fname1 = $r['fname'];
+				$q = "SELECT facilityname as fname FROM facility_view WHERE facilitycode='$fcode'";
+				$rs = mysqli_query($dbConn, $q) or die(mysqli_error($dbConn));
+				$r = mysqli_fetch_assoc($rs);
+				$fname = urlencode($r['fname']);
+				$fname1 = $r['fname'];
 
-				// $qq = "SELECT name FROM facilitys WHERE facilitycode='$tcode'";
-				// $rss = mysqli_query($dbConn, $qq) or die(mysqli_error($dbConn));
-				// $rr = mysqli_fetch_assoc($rss);
-				// $tname = urlencode($rr['name']);
-				// $tname1 = $rr['name'];
+				$qq = "SELECT name FROM facilitys WHERE facilitycode='$tcode'";
+				$rss = mysqli_query($dbConn, $qq) or die(mysqli_error($dbConn));
+				$rr = mysqli_fetch_assoc($rss);
+				$tname = urlencode($rr['name']);
+				$tname1 = $rr['name'];
 
 				$date = date('d-M-Y', strtotime($row_rssamp['End_Time']));
 				$today = date("Y-m-d");
@@ -202,10 +200,10 @@ if ($arr['password'] != '80SHe5MF7gM73t4aog5Q') {
 
 							if ($mtb == 'Positive') {
 
-								echo $x = file_get_contents("https://api.prsp.tangazoletu.com/?User_ID=13863&passkey=53P3YMG3&service=1&sender=NLTP&dest=$cphone&msg=Genexpert+Test+for+$pname+done+at+$tname1.+%0aThe+Summaries+are;Op/Ip+No:$opno,MobileNo:$mobile,Age:$age,MTB:$mtb,RIF:$mtbrif");
+								echo $x = file_get_contents("https://api.prsp.tangazoletu.com/?User_ID=13863&passkey=53P3YMG3&service=1&sender=NLTP&dest=$cphone&msg=Genexpert+Test+for+$pname+done+at+$fname.+%0aThe+Summaries+are;Op/Ip+No:$opno,MobileNo:$mobile,Age:$age,MTB:$mtb,RIF:$mtbrif");
 							} elseif ($mtb == 'Negative') {
 
-								echo $x = file_get_contents("https://api.prsp.tangazoletu.com/?User_ID=13863&passkey=53P3YMG3&service=1&sender=NLTP&dest=$cphone&msg=Genexpert+Test+for+$pname+done+at+$tname1.+%0aThe+Summaries+are;Op/Ip+No:$opno,MobileNo:$mobile,Age:$age,MTB:$mtb");
+								echo $x = file_get_contents("https://api.prsp.tangazoletu.com/?User_ID=13863&passkey=53P3YMG3&service=1&sender=NLTP&dest=$cphone&msg=Genexpert+Test+for+$pname+done+at+$fname.+%0aThe+Summaries+are;Op/Ip+No:$opno,MobileNo:$mobile,Age:$age,MTB:$mtb");
 							} else {
 							}
 						}
@@ -217,10 +215,10 @@ if ($arr['password'] != '80SHe5MF7gM73t4aog5Q') {
 
 								if ($mtb == 'Positive' or $mtb == 'Trace') {
 
-									echo $x = file_get_contents("https://api.prsp.tangazoletu.com/?User_ID=13863&passkey=53P3YMG3&service=1&sender=NLTP&dest=$sphone&msg=Genexpert+Test+for+$pname+done+at+$tname1.+%0aThe+Summaries+are;Op/Ip+No:$opno,MobileNo:$mobile,Age:$age,MTB:$mtb,RIF:$mtbrif");
+									echo $x = file_get_contents("https://api.prsp.tangazoletu.com/?User_ID=13863&passkey=53P3YMG3&service=1&sender=NLTP&dest=$sphone&msg=Genexpert+Test+for+$pname+done+at+$fname.+%0aThe+Summaries+are;Op/Ip+No:$opno,MobileNo:$mobile,Age:$age,MTB:$mtb,RIF:$mtbrif");
 								} elseif ($mtb == 'Negative') {
 
-									echo $x = file_get_contents("https://api.prsp.tangazoletu.com/?User_ID=13863&passkey=53P3YMG3&service=1&sender=NLTP&dest=$sphone&msg=Genexpert+Test+for+$pname+done+at+$tname1.+%0aThe+Summaries+are;Op/Ip+No:$opno,MobileNo:$mobile,Age:$age,MTB:$mtb");
+									echo $x = file_get_contents("https://api.prsp.tangazoletu.com/?User_ID=13863&passkey=53P3YMG3&service=1&sender=NLTP&dest=$sphone&msg=Genexpert+Test+for+$pname+done+at+$fname.+%0aThe+Summaries+are;Op/Ip+No:$opno,MobileNo:$mobile,Age:$age,MTB:$mtb");
 								} else {
 								}
 							}
@@ -234,44 +232,43 @@ if ($arr['password'] != '80SHe5MF7gM73t4aog5Q') {
 						}
 					}
 					//end
-				}
-				if ($row_rssamp['email_status'] == 1) {
-				} else {
-					if ($mtb == 'Error' or $mtb != 'Invalid' or $mtb != 'No Result') {
-						//send email
-						$mail = new PHPMailer();
-						$mail->IsSMTP();
-						$mail->Host = "smtp.gmail.com";
-						$mail->SMTPAuth = true;
-						$subject = "Genexpert Result Alert";
-						//	$SEmail = 'tibulims@nltp.co.ke'; //genexpert.nltp@gmail.com:axslaegzhbatpmna   tibulims@gmail.com:phosnybiltakzjrb    tibulims@nltp.co.ke:wsgaejhmwrexetdb
-						$SEmail = 'tibulims@nltp.co.ke';
-						$mail->Username = $SEmail;
-						$mail->Password = 'lfupgczgvpekzdbf';
-						//$mail->SMTPDebug = 1;  // debugging: 1 = errors and messages, 2 = messages only
-						$mail->SMTPSecure = 'tls'; //tls secure transfer enabled REQUIRED for Gmail
-						$mail->Port = 587; //25 //587
-						$contactemail = $row_rssamp['d_email'];
-						$emailaddress = $row_rssamp['c_email'];
-						$emailaddress1 = $row_rssamp['s_email'];
-						$mail->From = $SEmail;
-						$mail->FromName = $subject;
-						$mail->Sender = $SEmail;
-						//$mail->AddReplyTo("genexpert.nltp@gmail.com.", "Test - Alerts");
-						$mail->AddAddress($contactemail);
-						$mail->AddCC($emailaddress);
-						$mail->AddCC($emailaddress1);
-						$mail->Subject = $subject;
-						$mail->IsHTML(TRUE);
 
-						//$mail->AddStringAttachment($doc, $reporttitle, 'base64', 'application/pdf');
-						$mail->Body = "
-							Hello Team, <br>
-							
-							GeneXpert test for " . $row_rssamp['fullname'] . " was successfully at " . $fname . ". Please notify the patient to visit the facility where the test was done from to collect the results. Below are the test summaries.<br>
+					if ($row_rssamp['email_status'] == 1) {
+					} else {
+						if ($mtb != 'ERROR' || $mtb != 'Invalid' || $mtb != 'No Result') {
+							//send email
+							$mail = new PHPMailer();
+							$mail->IsSMTP();
+							$mail->Host = "smtp.gmail.com";
+							$mail->SMTPAuth = true;
+							$subject = "Genexpert Test Results Alert";
+							//$mail->Username = 'genexpert.nltp@gmail.com';
+							//$mail->Password = 'gxlims@2015!';
+							$SEmail= 'tibulims.nltp.co.ke';
+							$mail->Username = $SEmail;
+							$mail->Password = 'axslaegzhbatpmna';
+							$mail->SMTPDebug = 1;  // debugging: 1 = errors and messages, 2 = messages only
+							$mail->SMTPSecure = 'tls'; //tls secure transfer enabled REQUIRED for Gmail
+							$mail->Port = 587; //25 //587
+							$contactemail = $row_rssamp['d_email'];
+							$emailaddress = $row_rssamp['c_email'];
+							$emailaddress1 = $row_rssamp['s_email'];
+							$mail->From = $SEmail;
+							$mail->FromName = "Genexpert Results Alert";
+							$mail->Sender = $SEmail;
+							//$mail->AddReplyTo("genexpert.nltp@gmail.com.", "Test - Alerts");
+							$mail->AddAddress($contactemail);
+							$mail->AddCC($emailaddress);
+							$mail->AddCC($emailaddress1);
+							$mail->Subject = $subject;
+							$mail->IsHTML(TRUE);
+							//$mail->AddStringAttachment($doc, $reporttitle, 'base64', 'application/pdf');
+							$mail->Body = "
+							Hello Team, <br>							
+							GeneXpert test for " . $row_rssamp['fullname'] . " was successfully done. Please notify the patient to visit the facility where the test was done from to collect the results. Below are the test summaries.<br>
 							
 								    Lab No : " . $row_rssamp['lab_no'] . " <br>
-									Date Tested : " . $date . " <br>
+									Date Tested : " . $row_rssamp['coldate'] . " <br>
 									Patient Name : " . $row_rssamp['fullname'] . " <br>
 									Gender : " . $row_rssamp['gender'] . " <br>
 									Age : " . $row_rssamp['age'] . " <br>
@@ -279,92 +276,92 @@ if ($arr['password'] != '80SHe5MF7gM73t4aog5Q') {
 									Mobile No : " . $row_rssamp['mobile'] . " <br>
 									MTB Result: " . $row_rssamp['Test_Result'] . " <br>
 									MTB Rif: " . $row_rssamp['mtbRif'] . " <br>
-									Testing Facility: " . $fname . " <br>
-									Referring Facility: " . $tname . " <br>
+									Testing Facility: " . $tname1 . " <br>
+									Referring Facility: " . $fname1 . " <br>
 									Technician : " . $row_rssamp['User'] . " .<br>
 							    
 							Many Thanks.<br>
-							-- <br>
-							TB Support Team <br>
+							-- TIBULIMS Support Team <br>
 							This email was automatically generated. Please do not respond to this email address since it will be ignored.";
 
-						if (!$mail->Send()) {
-						} else {
+							if (!$mail->Send()) {
+							} else {
 
-							$query_rssamp = "UPDATE sample1 SET email_status=1 WHERE lab_no='$SampleID'";
-							$rssamp = mysqli_query($dbConn, $query_rssamp) or die(mysqli_error($dbConn));
+								$query_rssamp = "UPDATE sample1 SET email_status=1 WHERE lab_no='$SampleID'";
+								$rssamp = mysqli_query($dbConn, $query_rssamp) or die(mysqli_error($dbConn));
+							}
 						}
+
+						//Main team
+
+						// if ($mtb == 'Positive' and $mtbrif == 'Positive') {
+						// 	//send email
+						// 	$mail = new PHPMailer();
+						// 	$mail->IsSMTP();
+						// 	$mail->Host = "smtp.gmail.com";
+						// 	$mail->SMTPAuth = true;
+						// 	$subject = "Test Result Alert(MTB RIF)";
+						// 	//$mail->Username = 'genexpert.nltp@gmail.com';
+						// 	//$mail->Password = 'gxlims@2015!';
+						// 	$mail->Username = 'genexpert.nltp@gmail.com';
+						// 	$mail->Password = 'gxkenya@2015';
+						// 	$mail->SMTPDebug = 1;  // debugging: 1 = errors and messages, 2 = messages only
+						// 	$mail->SMTPSecure = 'tls'; //tls secure transfer enabled REQUIRED for Gmail
+						// 	$mail->Port = 587; //25
+						// 	$contactemail = "kiplimorichard@gmail.com";
+						// 	$emailaddress = "dorothymibei@gmail.com";
+						// 	$emailaddress1 = "mutheewanjiru@gmail.com";
+						// 	$emailaddress2 = "jckiarie@gmail.com";
+						// 	$emailaddress3 = "drunyaboke@gmail.com";
+						// 	$emailaddress4 = "elvismuriithi@gmail.com";
+						// 	$mail->From = "genexpert.nltp@gmail.com";
+						// 	$mail->FromName = "Test - Alerts";
+
+						// 	$mail->Sender = "genexpert.nltp@gmail.com"; //gxalertmails@nltp.co.ke
+						// 	//$mail->AddReplyTo("genexpert.nltp@gmail.com.", "Test - Alerts");
+						// 	$mail->AddAddress($contactemail);
+						// 	$mail->AddCC($emailaddress);
+						// 	$mail->AddCC($emailaddress1);
+						// 	$mail->AddCC($emailaddress2);
+						// 	$mail->AddCC($emailaddress3);
+						// 	$mail->AddCC($emailaddress4);
+						// 	$mail->Subject = $subject;
+						// 	$mail->IsHTML(TRUE);
+
+						// 	//$mail->AddStringAttachment($doc, $reporttitle, 'base64', 'application/pdf');
+						// 	$mail->Body = "
+						// 	Hello Team, <br>
+
+						// 	Below are the test summaries for GeneXpert test having Positive outcomes on both MTB and RIF.<br>
+
+						// 	        Full Name: " . $row_rssamp['fullname'] . "<br>
+						// 		    Lab No : " . $row_rssamp['lab_no'] . " <br>
+						// 			Date Tested : " . $row_rssamp['coldate'] . " <br>
+						// 			Patient Name : " . $row_rssamp['fullname'] . " <br>
+						// 			Gender : " . $row_rssamp['gender'] . " <br>
+						// 			Age : " . $row_rssamp['age'] . " <br>
+						// 			Patient Type : " . $row_rssamp['pat_type'] . " <br>
+						// 			Mobile No : " . $row_rssamp['mobile'] . " <br>
+						// 			MTB Result: " . $row_rssamp['Test_Result'] . " <br>
+						// 			MTB Rif: " . $row_rssamp['mtbRif'] . " <br>
+						// 			Testing Facility: " . $tname . " <br>
+						// 			Referring Facility: " . $fname . " <br>
+						// 			Technician : " . $row_rssamp['User'] . " .<br>
+
+						// 	Many Thanks.<br>
+						// 	-- <br>
+						// 	TB Support Team <br>
+						// 	This email was automatically generated. Please do not respond to this email address since it will be ignored.";
+
+						// 	if (!$mail->Send()) {
+						// 	} else {
+
+						// 		//$query_rssamp = "UPDATE sample1 SET email_status=1 WHERE lab_no='$SampleID'";
+						// 		//$rssamp = mysqli_query($dbConn,$query_rssamp) or die(mysqli_error($dbConn));
+
+						// 	}
+						// }
 					}
-
-					//Main team
-
-					// if ($mtb == 'Positive' and $mtbrif == 'Positive') {
-					// 	//send email
-					// 	$mail = new PHPMailer();
-					// 	$mail->IsSMTP();
-					// 	$mail->Host = "smtp.gmail.com";
-					// 	$mail->SMTPAuth = true;
-					// 	$subject = "Test Result Alert(MTB RIF)";
-					// 	//$mail->Username = 'genexpert.nltp@gmail.com';
-					// 	//$mail->Password = 'gxlims@2015!';
-					// 	$mail->Username = 'genexpert.nltp@gmail.com';
-					// 	$mail->Password = 'gxkenya@2015';
-					// 	$mail->SMTPDebug = 1;  // debugging: 1 = errors and messages, 2 = messages only
-					// 	$mail->SMTPSecure = 'tls'; //tls secure transfer enabled REQUIRED for Gmail
-					// 	$mail->Port = 587; //25
-					// 	$contactemail = "kiplimorichard@gmail.com";
-					// 	$emailaddress = "dorothymibei@gmail.com";
-					// 	$emailaddress1 = "mutheewanjiru@gmail.com";
-					// 	$emailaddress2 = "jckiarie@gmail.com";
-					// 	$emailaddress3 = "drunyaboke@gmail.com";
-					// 	$emailaddress4 = "elvismuriithi@gmail.com";
-					// 	$mail->From = "genexpert.nltp@gmail.com";
-					// 	$mail->FromName = "Test - Alerts";
-
-					// 	$mail->Sender = "genexpert.nltp@gmail.com"; //gxalertmails@nltp.co.ke
-					// 	//$mail->AddReplyTo("genexpert.nltp@gmail.com.", "Test - Alerts");
-					// 	$mail->AddAddress($contactemail);
-					// 	$mail->AddCC($emailaddress);
-					// 	$mail->AddCC($emailaddress1);
-					// 	$mail->AddCC($emailaddress2);
-					// 	$mail->AddCC($emailaddress3);
-					// 	$mail->AddCC($emailaddress4);
-					// 	$mail->Subject = $subject;
-					// 	$mail->IsHTML(TRUE);
-
-					// 	//$mail->AddStringAttachment($doc, $reporttitle, 'base64', 'application/pdf');
-					// 	$mail->Body = "
-					// 	Hello Team, <br>
-
-					// 	Below are the test summaries for GeneXpert test having Positive outcomes on both MTB and RIF.<br>
-
-					// 	        Full Name: " . $row_rssamp['fullname'] . "<br>
-					// 		    Lab No : " . $row_rssamp['lab_no'] . " <br>
-					// 			Date Tested : " . $row_rssamp['coldate'] . " <br>
-					// 			Patient Name : " . $row_rssamp['fullname'] . " <br>
-					// 			Gender : " . $row_rssamp['gender'] . " <br>
-					// 			Age : " . $row_rssamp['age'] . " <br>
-					// 			Patient Type : " . $row_rssamp['pat_type'] . " <br>
-					// 			Mobile No : " . $row_rssamp['mobile'] . " <br>
-					// 			MTB Result: " . $row_rssamp['Test_Result'] . " <br>
-					// 			MTB Rif: " . $row_rssamp['mtbRif'] . " <br>
-					// 			Testing Facility: " . $tname . " <br>
-					// 			Referring Facility: " . $fname . " <br>
-					// 			Technician : " . $row_rssamp['User'] . " .<br>
-
-					// 	Many Thanks.<br>
-					// 	-- <br>
-					// 	TB Support Team <br>
-					// 	This email was automatically generated. Please do not respond to this email address since it will be ignored.";
-
-					// 	if (!$mail->Send()) {
-					// 	} else {
-
-					// 		//$query_rssamp = "UPDATE sample1 SET email_status=1 WHERE lab_no='$SampleID'";
-					// 		//$rssamp = mysqli_query($dbConn,$query_rssamp) or die(mysqli_error($dbConn));
-
-					// 	}
-					// }
 				}
 			}
 		}
