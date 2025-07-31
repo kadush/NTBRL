@@ -1,506 +1,259 @@
-<?php
 
-session_start();
-require_once('connection/db.php');
-error_reporting(0);
+<?php 
+include("Asidebar.php");
+
+$todaydate=@date("d");
+$currentM=@date("m");
+$currentyr=@date("Y");
+$sql="SELECT 
+(
+   SELECT count(*) FROM facilitys
+)AS facilities, 
+(
+SELECT COUNT(distinct uname) FROM activitylog where activity='login' AND MONTH(tym)='$currentM' AND YEAR(tym)='$currentyr' AND DAY(tym)='$todaydate' 
+)AS log,
+(
+SELECT count(*)  FROM user
+)AS users,
+(
+SELECT count(ID) FROM facilitys where genesite=1
+)AS devices";
+$rs = mysqli_query($dbConn,$sql) or die(mysqli_error($dbConn)());
+$rows = mysqli_fetch_assoc($rs);
+
+$sql1="SELECT distinct a.groupName,count(b.category) FROM usergroup a,user b where a.usergroupID=b.category group by category";
+$rs1 = mysqli_query($dbConn,$sql1) or die(mysqli_error($dbConn)());
+$rows1 = mysqli_fetch_array($rs1);
+
+$query_rssample = "SELECT a.uname as b,a.activity as c,b.groupName as d, a.tym as e,a.facility as f FROM activitylog a, usergroup b WHERE a.ugroup=b.usergroupID AND MONTH(a.tym)='$currentM' AND YEAR(a.tym)='$currentyr' ORDER BY a.ID DESC";
+$rssample = mysqli_query($dbConn,$query_rssample) or die(mysqli_error($dbConn)());
+$row_rssample = mysqli_fetch_assoc($rssample);
 
 ?>
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="utf-8">
-    <title>TIBULIMS|Login</title>
-    <link rel="icon" href="assets/img/favicon.ico" type="image/x-icon" />
-    <style>
-        /* Reset CSS */
-        html,
-        body,
-        div,
-        span,
-        applet,
-        object,
-        iframe,
-        h1,
-        h2,
-        h3,
-        h3,
-        h5,
-        h6,
-        p,
-        blockquote,
-        pre,
-        a,
-        abbr,
-        acronym,
-        address,
-        big,
-        cite,
-        code,
-        del,
-        dfn,
-        em,
-        font,
-        img,
-        ins,
-        kbd,
-        q,
-        s,
-        samp,
-        small,
-        strike,
-        strong,
-        sub,
-        sup,
-        tt,
-        var,
-        b,
-        u,
-        i,
-        center,
-        dl,
-        dt,
-        dd,
-        ol,
-        ul,
-        li,
-        fieldset,
-        form,
-        hubel,
-        legend,
-        table,
-        caption,
-        tbody,
-        tfoot,
-        thead,
-        tr,
-        th,
-        td {
-            margin: 0;
-            padding: 0;
-            border: 0;
-            outline: 0;
-            font-size: 100%;
-            vertical-align: baseline;
-            background: transparent;
-        }
-
-        body {
-            background: #DCDDDF;
-            color: #000;
-            font: 14px Arial;
-            margin: 0 auto;
-            padding: 0;
-            position: relative;
-        }
-
-        h1 {
-            font-size: 28px;
-        }
-
-        h2 {
-            font-size: 26px;
-        }
-
-        h3 {
-            font-size: 18px;
-        }
-
-        h3 {
-            font-size: 16px;
-        }
-
-        h5 {
-            font-size: 14px;
-        }
-
-        h6 {
-            font-size: 12px;
-        }
-
-        h1,
-        h2,
-        h3,
-        h3,
-        h5,
-        h6 {
-            color: #563D64;
-        }
-
-        small {
-            font-size: 10px;
-        }
-
-        b,
-        strong {
-            font-weight: bold;
-        }
-
-        a {
-            text-decoration: none;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-
-        .left {
-            float: left;
-        }
-
-        .right {
-            float: right;
-        }
-
-        .alignleft {
-            float: left;
-            margin-right: 15px;
-        }
-
-        .alignright {
-            float: right;
-            margin-left: 15px;
-        }
-
-        .clearfix:after,
-        form:after {
-            content: ".";
-            display: block;
-            height: 0;
-            clear: both;
-            visibility: hidden;
-        }
-
-        .container {
-            margin: 60px auto;
-            position: relative;
-            width: 900px;
-        }
-
-        #content {
-            background: #f9f9f9;
-            background: -moz-linear-gradient(top, rgba(248, 248, 248, 1) 0%, rgba(249, 249, 249, 1) 100%);
-            background: -webkit-linear-gradient(top, rgba(248, 248, 248, 1) 0%, rgba(249, 249, 249, 1) 100%);
-            background: -o-linear-gradient(top, rgba(248, 248, 248, 1) 0%, rgba(249, 249, 249, 1) 100%);
-            background: -ms-linear-gradient(top, rgba(248, 248, 248, 1) 0%, rgba(249, 249, 249, 1) 100%);
-            background: linear-gradient(top, rgba(248, 248, 248, 1) 0%, rgba(249, 249, 249, 1) 100%);
-            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#f8f8f8', endColorstr='#f9f9f9', GradientType=0);
-            -webkit-box-shadow: 0 1px 0 #fff inset;
-            -moz-box-shadow: 0 1px 0 #fff inset;
-            -ms-box-shadow: 0 1px 0 #fff inset;
-            -o-box-shadow: 0 1px 0 #fff inset;
-            box-shadow: 0 1px 0 #fff inset;
-            border: 1px solid #c4c6ca;
-            margin: 19 auto;
-            padding: 25px 0 0;
-            position: relative;
-            text-align: center;
-            text-shadow: 0 1px 0 #fff;
-            width: 400px;
-        }
-
-        #content h1 {
-            color: #7E7E7E;
-            font: bold 25px Helvetica, Arial, sans-serif;
-            letter-spacing: -0.05em;
-            line-height: 20px;
-            margin: 10px 0 30px;
-        }
-
-        #content h1:before,
-        #content h1:after {
-            content: "";
-            height: 1px;
-            position: absolute;
-            top: 10px;
-            width: 27%;
-        }
-
-        #content h1:after {
-            background: rgb(126, 126, 126);
-            background: -moz-linear-gradient(left, rgba(126, 126, 126, 1) 0%, rgba(255, 255, 255, 1) 100%);
-            background: -webkit-linear-gradient(left, rgba(126, 126, 126, 1) 0%, rgba(255, 255, 255, 1) 100%);
-            background: -o-linear-gradient(left, rgba(126, 126, 126, 1) 0%, rgba(255, 255, 255, 1) 100%);
-            background: -ms-linear-gradient(left, rgba(126, 126, 126, 1) 0%, rgba(255, 255, 255, 1) 100%);
-            background: linear-gradient(left, rgba(126, 126, 126, 1) 0%, rgba(255, 255, 255, 1) 100%);
-            right: 0;
-        }
-
-        #content h1:before {
-            background: rgb(126, 126, 126);
-            background: -moz-linear-gradient(right, rgba(126, 126, 126, 1) 0%, rgba(255, 255, 255, 1) 100%);
-            background: -webkit-linear-gradient(right, rgba(126, 126, 126, 1) 0%, rgba(255, 255, 255, 1) 100%);
-            background: -o-linear-gradient(right, rgba(126, 126, 126, 1) 0%, rgba(255, 255, 255, 1) 100%);
-            background: -ms-linear-gradient(right, rgba(126, 126, 126, 1) 0%, rgba(255, 255, 255, 1) 100%);
-            background: linear-gradient(right, rgba(126, 126, 126, 1) 0%, rgba(255, 255, 255, 1) 100%);
-            left: 0;
-        }
-
-        #content:after,
-        #content:before {
-            background: #f9f9f9;
-            background: -moz-linear-gradient(top, rgba(248, 248, 248, 1) 0%, rgba(249, 249, 249, 1) 100%);
-            background: -webkit-linear-gradient(top, rgba(248, 248, 248, 1) 0%, rgba(249, 249, 249, 1) 100%);
-            background: -o-linear-gradient(top, rgba(248, 248, 248, 1) 0%, rgba(249, 249, 249, 1) 100%);
-            background: -ms-linear-gradient(top, rgba(248, 248, 248, 1) 0%, rgba(249, 249, 249, 1) 100%);
-            background: linear-gradient(top, rgba(248, 248, 248, 1) 0%, rgba(249, 249, 249, 1) 100%);
-            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#f8f8f8', endColorstr='#f9f9f9', GradientType=0);
-            border: 1px solid #c4c6ca;
-            content: "";
-            display: block;
-            height: 100%;
-            left: -1px;
-            position: absolute;
-            width: 100%;
-        }
-
-        #content:after {
-            -webkit-transform: rotate(2deg);
-            -moz-transform: rotate(2deg);
-            -ms-transform: rotate(2deg);
-            -o-transform: rotate(2deg);
-            transform: rotate(2deg);
-            top: 0;
-            z-index: -1;
-        }
-
-        #content:before {
-            -webkit-transform: rotate(-3deg);
-            -moz-transform: rotate(-3deg);
-            -ms-transform: rotate(-3deg);
-            -o-transform: rotate(-3deg);
-            transform: rotate(-3deg);
-            top: 0;
-            z-index: -2;
-        }
-
-        #content form {
-            margin: 0 20px;
-            position: relative
-        }
-
-        #content form input[type="text"],
-        #content form input[type="password"] {
-            -webkit-border-radius: 3px;
-            -moz-border-radius: 3px;
-            -ms-border-radius: 3px;
-            -o-border-radius: 3px;
-            border-radius: 3px;
-            -webkit-box-shadow: 0 1px 0 #fff, 0 -2px 5px rgba(0, 0, 0, 0.08) inset;
-            -moz-box-shadow: 0 1px 0 #fff, 0 -2px 5px rgba(0, 0, 0, 0.08) inset;
-            -ms-box-shadow: 0 1px 0 #fff, 0 -2px 5px rgba(0, 0, 0, 0.08) inset;
-            -o-box-shadow: 0 1px 0 #fff, 0 -2px 5px rgba(0, 0, 0, 0.08) inset;
-            box-shadow: 0 1px 0 #fff, 0 -2px 5px rgba(0, 0, 0, 0.08) inset;
-            -webkit-transition: all 0.5s ease;
-            -moz-transition: all 0.5s ease;
-            -ms-transition: all 0.5s ease;
-            -o-transition: all 0.5s ease;
-            transition: all 0.5s ease;
-            background: #eae7e7 url(../assets/img/8bcLQqF.png) no-repeat;
-            border: 1px solid #c8c8c8;
-            color: #777;
-            font: 13px Helvetica, Arial, sans-serif;
-            margin: 0 0 10px;
-            padding: 15px 10px 15px 40px;
-            width: 80%;
-
-        }
-
-        #content form input[type="text"]:focus,
-        #content form input[type="password"]:focus {
-            -webkit-box-shadow: 0 0 2px #ed1c24 inset;
-            -moz-box-shadow: 0 0 2px #ed1c24 inset;
-            -ms-box-shadow: 0 0 2px #ed1c24 inset;
-            -o-box-shadow: 0 0 2px #ed1c24 inset;
-            box-shadow: 0 0 2px #ed1c24 inset;
-            background-color: #fff;
-            border: 1px solid #ed1c24;
-            outline: none;
-        }
-
-        #username {
-            background-position: 10px 10px !important
-        }
-
-        #password {
-            background-position: 10px -53px !important
-        }
-
-        #content form input[type="submit"] {
-            background: #9CC;
-            background: -moz-linear-gradient(top, rgba(254, 231, 154, 1) 0%, rgba(254, 193, 81, 1) 100%);
-            background: -webkit-linear-gradient(top, rgba(254, 231, 154, 1) 0%, rgba(254, 193, 81, 1) 100%);
-            background: -o-linear-gradient(top, rgba(254, 231, 154, 1) 0%, rgba(254, 193, 81, 1) 100%);
-            background: -ms-linear-gradient(top, rgba(254, 231, 154, 1) 0%, rgba(254, 193, 81, 1) 100%);
-            background: linear-gradient(top, rgba(254, 231, 154, 1) 0%, rgba(254, 193, 81, 1) 100%);
-            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fee79a', endColorstr='#fec151', GradientType=0);
-            -webkit-border-radius: 30px;
-            -moz-border-radius: 30px;
-            -ms-border-radius: 30px;
-            -o-border-radius: 30px;
-            border-radius: 30px;
-            -webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset;
-            -moz-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset;
-            -ms-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset;
-            -o-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset;
-            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset;
-            border: 1px solid #D69E31;
-            color: #85592e;
-            cursor: pointer;
-            float: left;
-            font: bold 15px Helvetica, Arial, sans-serif;
-            height: 35px;
-            margin: 20px 0 35px 40px;
-            position: relative;
-            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-            width: 133px;
-        }
-
-        #content form input[type="submit"]:hover {
-            background: #9CC;
-            background: -moz-linear-gradient(top, rgba(254, 193, 81, 1) 0%, rgba(254, 231, 154, 1) 100%);
-            background: -webkit-linear-gradient(top, rgba(254, 193, 81, 1) 0%, rgba(254, 231, 154, 1) 100%);
-            background: -o-linear-gradient(top, rgba(254, 193, 81, 1) 0%, rgba(254, 231, 154, 1) 100%);
-            background: -ms-linear-gradient(top, rgba(254, 193, 81, 1) 0%, rgba(254, 231, 154, 1) 100%);
-            background: linear-gradient(top, rgba(254, 193, 81, 1) 0%, rgba(254, 231, 154, 1) 100%);
-            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fec151', endColorstr='#fee79a', GradientType=0);
-
-        }
-
-        #content form div a {
-            color: #004a80;
-            float: right;
-            font-size: 12px;
-            margin: 30px 15px 0 0;
-            text-decoration: underline;
-        }
-
-        .button {
-            background: #9CC;
-            background: -moz-linear-gradient(top, rgba(247, 249, 250, 1) 0%, rgba(240, 240, 240, 1) 100%);
-            background: -webkit-linear-gradient(top, rgba(247, 249, 250, 1) 0%, rgba(240, 240, 240, 1) 100%);
-            background: -o-linear-gradient(top, rgba(247, 249, 250, 1) 0%, rgba(240, 240, 240, 1) 100%);
-            background: -ms-linear-gradient(top, rgba(247, 249, 250, 1) 0%, rgba(240, 240, 240, 1) 100%);
-            background: linear-gradient(top, rgba(247, 249, 250, 1) 0%, rgba(240, 240, 240, 1) 100%);
-            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#f7f9fa', endColorstr='#f0f0f0', GradientType=0);
-            -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
-            -moz-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
-            -ms-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
-            -o-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
-            -webkit-border-radius: 0 0 5px 5px;
-            -moz-border-radius: 0 0 5px 5px;
-            -o-border-radius: 0 0 5px 5px;
-            -ms-border-radius: 0 0 5px 5px;
-            border-radius: 0 0 5px 5px;
-            border-top: 1px solid #CFD5D9;
-            padding: 15px 0;
-        }
-
-        .button a {
-            background: url(../assets/img/8bcLQqF.png) 0 -112px no-repeat;
-            color: #7E7E7E;
-            font-size: 17px;
-            padding: 2px 0 2px 40px;
-            text-decoration: none;
-            -webkit-transition: all 0.3s ease;
-            -moz-transition: all 0.3s ease;
-            -ms-transition: all 0.3s ease;
-            -o-transition: all 0.3s ease;
-            transition: all 0.3s ease;
-        }
-
-        .button a:hover {
-            background-position: 0 -135px;
-            color: #00aeef;
-        }
-    </style>
-    <link rel="stylesheet" type="text/css" href="assets/css/style2.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="assets/css/style1.css" media="screen" />
-    <script src="assets/neon/neon-x/assets/js/jquery-1.10.2.min.js"></script>
-    <link rel="stylesheet" href="assets/neon/neon-x/assets/js/jquery-ui/css/no-theme/jquery-ui-1.10.3.custom.min.css" id="style-resource-1">
-    <link rel="stylesheet" href="assets/neon/neon-x/assets/css/font-icons/entypo/css/entypo.css" id="style-resource-2">
-    <link rel="stylesheet" href="assets/neon/neon-x/assets/css/font-icons/entypo/css/animation.css" id="style-resource-3">
-    <link rel="stylesheet" href="assets/neon/neon-x/assets/css/neon.css" id="style-resource-5">
-    <link rel="stylesheet" href="assets/neon/neon-x/assets/css/custom.css" id="style-resource-6">
-
-</head>
-<body>
-    <div id="site-wrapper">
-        <div id="header">
-            <div id="top">
-                <div align="center" id="logo">
-                    <img width="600px" height="80px" src="assets/img/Tibu-Lims.png" class="img-responsive" />
-                    <!-- <img align="right" src="img/gx.jpg" alt="" height="65px"/> -->
-                </div>
-            </div>
-            <center>
-                <div class="container">
-                    <table border='0' style="width:100%;margin-left:auto;margin-right:auto;">
-                        <tr>
-                            <td style="width:25%;text-align: right; padding-right: 10%;">
-                                <a href='http://tibulims.dltld.or.ke/ntbrl/login'><img width="133px" height="133px" src="img/gx.jfif" class='box-inner'></img></a>
-
-                                <a href='http://tibulims.dltld.or.ke/ntbrl/login'>
-                                    <h3>Genexpert Portal</h3>
-                                </a>
-                            </td>
-                            <td style="text-align: left;width:25%;padding-left: 10%;">
-                                <a href='http://tibulims.dltld.or.ke/ntbrl/login'><img width="133px" height="133px" src="img/truenat.png" class='box-inner'></img></a>
-
-                                <a href='http://tibulims.dltld.or.ke/ntbrl/login'>
-                                    <h3>TrueNat Portal</h3>
-                                </a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="width:25%;text-align: right;padding-right: 10%;">
-                                <a href='http://tibulims.dltld.or.ke/EQA/'><img width="133px" height="133px" src="img/microscope.png" class='box-inner'></img></a>
-
-                                <a href='http://tibulims.dltld.or.ke/EQA/'>
-                                    <h3>AFB Portal(SCMLT)</h3>
-                                </a>
-                            </td>
-                            <td style="text-align: left;width:25%;padding-left: 10%;">
-                                <a href='http://tibulims.dltld.or.ke/cad4tb/'><img width="133px" height="133px" src="img/cxr.JPG" class='box-inner'></img></a>
-
-                                <a href='http://tibulims.dltld.or.ke/cad4tb/'>
-                                    <h3>CAD4TB Portal</h3>
-                                </a>
-                            </td>
-                        </tr>
-                    </table>
-                </div><!-- container -->
-            </center>
-            <div id="footer">
-
-            </div>
-
-        </div>
-    </div>
-    <link rel="stylesheet" href="assets/neon/neon-x/assets/js/select2/select2-bootstrap.css" id="style-resource-1">
-    <link rel="stylesheet" href="assets/neon/neon-x/assets/js/select2/select2.css" id="style-resource-2">
-
-    <script src="assets/neon/neon-x/assets/js/jquery.inputmask.bundle.min.js" id="script-resource-7"></script>
-    <script src="assets/neon/neon-x/assets/js/gsap/main-gsap.js" id="script-resource-1"></script>
-    <script src="assets/neon/neon-x/assets/js/jquery-ui/js/jquery-ui-1.10.3.minimal.min.js" id="script-resource-2"></script>
-    <script src="assets/neon/neon-x/assets/js/bootstrap.min.js" id="script-resource-3"></script>
-    <script src="assets/neon/neon-x/assets/js/joinable.js" id="script-resource-4"></script>
-    <script src="assets/neon/neon-x/assets/js/resizeable.js" id="script-resource-5"></script>
-    <script src="assets/neon/neon-x/assets/js/neon-api.js" id="script-resource-6"></script>
-    <script src="assets/neon/neon-x/assets/js/jquery.dataTables.min.js" id="script-resource-7"></script>
-    <script src="assets/neon/neon-x/assets/js/dataTables.bootstrap.js" id="script-resource-8"></script>
-    <script src="assets/neon/neon-x/assets/js/select2/select2.min.js" id="script-resource-9"></script>
-    <script src="assets/neon/neon-x/assets/js/neon-chat.js" id="script-resource-10"></script>
-    <script src="assets/neon/neon-x/assets/js/neon-custom.js" id="script-resource-11"></script>
-    <script src="assets/neon/neon-x/assets/js/neon-demo.js" id="script-resource-12"></script>
-    <script src="assets/neon/neon-x/assets/js/toastr.js" id="script-resource-7"></script>
-    <script src="assets/neon/neon-x/assets/js/bootstrap-datepicker.js" id="script-resource-11"></script>
-    <script type="text/javascript" src="assets/js/jquery-multi-select/js/jquery.multi-select.js"></script>
-
-    <script src="assets/js/select-init.js"></script>
+<div class="main-content" style="margin-top: -1%">
+<?php include("Aheader.php");	 ?>	
 
 
+<hr />
+
+<script type="text/javascript">
+	jQuery(document).ready(function($)
+	{
+		$("#table-1").dataTable({
+			"sPaginationType": "bootstrap",
+			"aLengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+			"bStateSave": true
+		});
+		
+		$(".dataTables_wrapper select").select2({
+			minimumResultsForSearch: -1
+		});
+	});
+	
+</script>
+
+
+<div class="row">
+	<div class="col-sm-3">
+	<a href="userlog.php">
+		<div class="tile-stats tile-red">
+			<div class="icon"><i class="entypo-users"></i></div>
+			<div class="num" data-start="0" data-end="<?php echo $rows['users'] ?>" data-postfix="" data-duration="1500" data-delay="0">0</div>
+			
+			<h3>Registered Users</h3>
+			<p>so far in our website.</p>
+		</div>
+	</a>	
+	</div>
+	
+	<div class="col-sm-3">
+	<a href="facility.php">
+		<div class="tile-stats tile-green">
+			<div class="icon"><i class="entypo-chart-bar"></i></div>
+			 <div class="num" data-start="0" data-end="<?php echo $rows['devices'] ?>" data-postfix="" data-duration="1500" data-delay="600">0</div>
+			
+			<h3>GeneXpert Devices</h3>
+			<p>in the country.</p>
+		</div>
+	</a>	
+	</div>
+	
+	<div class="col-sm-3">
+	
+		<div class="tile-stats tile-aqua">
+			<div class="icon"><i class="entypo-mail"></i></div>
+			<div class="num" data-start="0" data-end="<?php echo $rows['log'] ?>" data-postfix="" data-duration="1500" data-delay="1200">0</div>
+			
+			<h3>Access Logs</h3>
+			<p>attempted today.</p>
+		</div>
+		
+	</div>
+	
+	<div class="col-sm-3">
+	<a href="facility.php">
+		<div class="tile-stats tile-blue">
+			<div class="icon"><i class="entypo-rss"></i></div>
+			<div class="num" data-start="0" data-end="<?php echo $rows['facilities'] ?>" data-postfix="" data-duration="1500" data-delay="1800">0</div>
+			
+			<h3>Facilities</h3>
+			<p>in the country.</p>
+		</div>
+	</a>	
+	</div>
+</div>
+
+<br />
+
+<div class="row">
+	<div class="col-sm-8">
+	
+		<div class="panel panel-gradient" data-collapsed="0">
+		
+			<div class="panel-heading">
+				<div class="panel-title">Site Login / Logout Stats</div>
+				
+				
+			</div>
+	
+			<div class="panel-body">
+			   <div id="chartdivtrendd"  align="center"> 
+				 <script type="text/javascript">
+				    var myChart = new FusionCharts("MSLine", "myChartId", "640", "210");
+				    myChart.setDataURL("logtrend.php");
+				    myChart.render("chartdivtrendd");
+				 </script> 
+								
+			</div>
+
+				</div>				
+		</div>	
+
+	</div>
+
+	<div class="col-sm-4">
+
+		<div class="panel panel-gradient" data-collapsed="0">
+			<div class="panel-heading">
+				<div class="panel-title">
+					<h4>
+						Real Time Stats
+						<br />
+						<small>current system users</small>
+					</h4>
+				</div>
+				
+				<div class="panel-options">
+					<a href="#sample-modal" data-toggle="modal" data-target="#sample-modal-dialog-1" class="bg"><i class="entypo-cog"></i></a>
+					<a href="#" data-rel="collapse"><i class="entypo-down-open"></i></a>
+					<a href="#" data-rel="reload"><i class="entypo-arrows-ccw"></i></a>
+					<a href="#" data-rel="close"><i class="entypo-cancel"></i></a>
+				</div>
+			</div>
+		
+			<div class="panel-body no-padding">
+				<?php $class=array("primary"=>"1","info"=>"2","danger"=>"3","success"=>"4","warning"=>"5"); do { ?>
+								<li class="list-group-item">
+									<span class="badge badge-<?php  echo array_rand($class,1); ?>"><?php echo $rows1[1]; ?></span>
+									<?php echo $rows1[0]; ?>
+								</li>
+					<?php } while ($rows1 = mysqli_fetch_array($rs1)); ?>			
+			</div>
+		</div>
+
+	</div>
+</div>
+
+
+<br />
+
+<div class="row">
+	
+	
+	<div class="col-sm-12">
+		
+		<div class="panel panel-gradient" data-collapsed="0">
+			<div class="panel-heading">
+				<div class="panel-title">Recent System Logs</div>
+				
+				<div class="panel-options">
+					<a href="#sample-modal" data-toggle="modal" data-target="#sample-modal-dialog-1" class="bg"><i class="entypo-cog"></i></a>
+					<a href="#" data-rel="collapse"><i class="entypo-down-open"></i></a>
+					<a href="#" data-rel="reload"><i class="entypo-arrows-ccw"></i></a>
+					<a href="#" data-rel="close"><i class="entypo-cancel"></i></a>
+				</div>
+			</div>
+				
+			<table class="table table-bordered" id="table-1">
+				<thead>
+					<tr>
+						<th>#</th>
+						<th>Name</th>
+						<th>Facility</th>
+						<th>Position</th>
+						<th>Activity</th>
+						<th>Time of Activity</th>
+					</tr>
+				</thead>
+				
+				<tbody>
+					<?php do { ?>
+					<tr>
+						<td><label class="cb-wrapper">
+<input id="chk-2" type="checkbox">
+<div class="checked"></div>
+</label></td>
+						<td><?php echo $row_rssample['b']; ?></td>
+						<td><?php echo $row_rssample['f']; ?></td>
+						<td><?php echo $row_rssample['d']; ?></td>
+						<td><?php echo $row_rssample['c']; ?></td>
+						<td><?php echo $row_rssample['e']; ?></td>
+					</tr>
+					<?php } while ($row_rssample = mysqli_fetch_assoc($rssample)); ?>
+					
+				</tbody>
+			</table>
+		</div>
+		
+	</div>
+	
+</div>
+
+<br />
+
+
+
+
+<!-- Footer -->
+<footer class="main">
+	
+    <div class="pull-right">
+		<?php 
+		include '../includes/footer.php';
+		?>
+	</div>
+
+</footer>	
+</div>
+	
+
+	<link rel="stylesheet" href="neon/neon-x/assets/js/select2/select2-bootstrap.css"  id="style-resource-1">
+	<link rel="stylesheet" href="neon/neon-x/assets/js/select2/select2.css"  id="style-resource-2">
+
+	<script src="neon/neon-x/assets/js/gsap/main-gsap.js" id="script-resource-1"></script>
+	<script src="neon/neon-x/assets/js/jquery-ui/js/jquery-ui-1.10.3.minimal.min.js" id="script-resource-2"></script>
+	<script src="neon/neon-x/assets/js/bootstrap.min.js" id="script-resource-3"></script>
+	<script src="neon/neon-x/assets/js/joinable.js" id="script-resource-4"></script>
+	<script src="neon/neon-x/assets/js/resizeable.js" id="script-resource-5"></script>
+	<script src="neon/neon-x/assets/js/neon-api.js" id="script-resource-6"></script>
+	<script src="neon/neon-x/assets/js/jquery.dataTables.min.js" id="script-resource-7"></script>
+	<script src="neon/neon-x/assets/js/dataTables.bootstrap.js" id="script-resource-8"></script>
+	<script src="neon/neon-x/assets/js/select2/select2.min.js" id="script-resource-9"></script>
+	<script src="neon/neon-x/assets/js/neon-chat.js" id="script-resource-10"></script>
+	<script src="neon/neon-x/assets/js/neon-custom.js" id="script-resource-11"></script>
+	<script src="neon/neon-x/assets/js/neon-demo.js" id="script-resource-12"></script>
+	
+	
 </body>
-
 </html>

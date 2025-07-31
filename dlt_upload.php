@@ -1,18 +1,18 @@
 <?php
-//p@55w0rddv1
-include('header.php');
+
+include('Aheader.php');
 
 if ((isset($_POST["btnUpload"]) == "up")) {
 	//p@55w0rddv1
-	$connect = mysql_connect('localhost','root','');
+	$connect = mysqli_connect('localhost','root','');
 if (!$connect) { 
-    die('Could not connect to MySQL: ' . mysql_error()); 
+    die('Could not connect to mysqli: ' . mysqli_error($dbConn)()); 
 } 
 
-$cid =mysql_select_db('db_ntrl',$connect); 
+$cid =mysqli_select_db('db_ntrl',$connect); 
 $fieldseparator = ",";
 $lineseparator = "\n";
-$target_path = "Csvfiles/";
+$target_path = "../Csvfiles/";
 
 $target_path = $target_path . basename( $_FILES['file']['name']); 
 
@@ -148,7 +148,7 @@ foreach ($insert_array as $key => $value)
 
 $sql_insert;
  
-$query=mysql_query($fin, $connect );
+$query=mysqli_query($dbConn,$fin, $connect );
 
 //echo "Found a total of $lines records in this csv file.<br>";
  
@@ -159,22 +159,22 @@ echo "window.location.href='dlt_upload.php?msg=$suceessmsg'";
 echo "</script>";
 @header( 'Location: dlt_upload.php');
 
-mysql_close($connect);
+mysqli_close($connect);
 	
 	
 	
 }
 ?>
-<link rel="stylesheet" type="text/css" href="style.css" media="screen" />
-   <link rel="stylesheet" href="jquery-ui-1.10.3/themes/base/jquery.ui.tabs.css">
-   <link rel="stylesheet" href="jquery-ui-1.10.3/themes/base/jquery-ui.css">
+<link rel="stylesheet" type="text/css" href="../style.css" media="screen" />
+   <link rel="stylesheet" href="../jquery-ui-1.10.3/themes/base/jquery.ui.tabs.css">
+   <link rel="stylesheet" href="../jquery-ui-1.10.3/themes/base/jquery-ui.css">
 
-<link rel="stylesheet" href="jquery-ui-1.10.3/demos/demos.css">
+<link rel="stylesheet" href="../jquery-ui-1.10.3/demos/demos.css">
     
   
-<script src="SpryAssets/SpryValidationTextField.js" type="text/javascript"></script>
+<script src="../SpryAssets/SpryValidationTextField.js" type="text/javascript"></script>
 
-<link href="SpryAssets/SpryValidationTextField.css" rel="stylesheet" type="text/css" />
+<link href="../SpryAssets/SpryValidationTextField.css" rel="stylesheet" type="text/css" />
 
 <div class="clearer">&nbsp;</div>
 <div class="main" id="main-two-columns">
@@ -241,15 +241,8 @@ mysql_close($connect);
     </table>
   </form>
   </div>
-</div>
-			
 
-	<?php
-include("sidebar.php");
-?>			
-
-			
-		
+	
 <div class="clearer">&nbsp;</div>
 
 </div>
@@ -260,5 +253,5 @@ include("sidebar.php");
 </body>
 </html>
 <?php
-include("includes/footer.php");
+include("../includes/footer.php");
 ?>
