@@ -5,7 +5,7 @@ if (isset($_GET['id'])){
 		$countyID = $_GET['id'];
 		  
 	}
-mysql_select_db($database, $ntrl);
+
 $sql= "SELECT countys.ID as a,countys.name as b,sum(consumption.allocated) as c
  FROM `consumption` ,facilitys, `districts` ,`countys`
 WHERE 
@@ -14,8 +14,8 @@ AND  `districts`.`ID` = `facilitys`.`district`
 AND consumption.status=1
 AND `countys`.`ID` = `districts`.`county`
 Group by  countys.ID";
-$RsCounty = mysql_query($sql, $ntrl) or die(mysql_error());
-$row_RsCounty = mysql_fetch_assoc($RsCounty);
+$RsCounty = mysqli_query($dbConn,$sql) or die(mysqli_error($dbConn));
+$row_RsCounty = mysqli_fetch_assoc($RsCounty);
 
 
 $maximumyear = GetMaxYearCon();
@@ -53,7 +53,7 @@ $minyear = GetMinYearCon();
 					?>
 					      <option value="<?php echo $row_RsCounty['a']; ?>"><?php echo $row_RsCounty['b']; ?></option>
 					      <?php
-					} while ($row_RsCounty = mysql_fetch_assoc($RsCounty)); ?> 
+					} while ($row_RsCounty = mysqli_fetch_assoc($RsCounty)); ?> 
 					?>
 			        </select>
 			        </td>

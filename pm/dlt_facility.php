@@ -1,78 +1,27 @@
 <?php require_once('../connection/db.php'); 
 include("header.php");
+$query_rsUser = "SELECT  * FROM facility_map where mfl !='99999' ORDER BY facility asc";
+$rsUser = mysqli_query($dbConn,$query_rsUser) or die(mysqli_error($dbConn));
+$row_rsUser = mysqli_fetch_assoc($rsUser);
+$totalRows_rsUser = mysqli_num_rows($rsUser);
 
+$query_rsGX = "SELECT  * FROM facility_map where genesite=1 and mfl !='99999' ORDER BY facility asc";
+$rsGX = mysqli_query($dbConn,$query_rsGX) or die(mysqli_error($dbConn));
+$row_rsGX = mysqli_fetch_assoc($rsGX);
+$totalRows_rsGX = mysqli_num_rows($rsGX);
 
-mysql_select_db($database, $ntrl);
-$sql = "SELECT 
-`facilitys`.`facilitycode` AS CODE,
-`facilitys`.`name` AS FACILITY, 
-`districts`.`name` AS DISTRICT,
-`countys`.`name` AS COUNTY, 
-`provinces`.`name` AS PROVINCE 
+//$query_rsR = "SELECT distinct mfl,facility,sub_county,county FROM consumption_view where mfl !='99999' ORDER BY facility asc";
+$query_rsR = "SELECT * FROM facility_map where truenat=1 and mfl !='99999' ORDER BY facility asc";
+$rsR = mysqli_query($dbConn,$query_rsR) or die(mysqli_error($dbConn));
+$row_rsR = mysqli_fetch_assoc($rsR);
+$totalRows_rsR = mysqli_num_rows($rsR);
 
-FROM `facilitys` , `districts` ,`countys`, `provinces`
-WHERE 
-`districts`.`ID` = `facilitys`.`district`
-AND `countys`.`ID` = `districts`.`county`
-AND `countys`.`province` = `provinces`.`ID`
- ";
-$query=mysql_query($sql);
-$numrows=@mysql_num_rows($query);
-
-if(!$numrows){
-$dyn_table2 .= '<tr bgcolor="#CCC"><th><small>MFL Code</small></th><th><small>Facility</small></th><th><small>District</small></th><th><small>County</small></th><th><small>Province</small></th>';
-$dyn_table2 .= '<tr><td colspan="4" align="center"> <small>No Data to Display </small></td></tr>';
-}
-else{
-$i=0;
-$dyn_table2 = '<table class="table table-bordered datatable" id="table-1">'; 
- 	
-while($row=mysql_fetch_assoc($query)){
-	
-
-$code=$row['CODE'];	
-$facility=$row['FACILITY'];	
-$district=$row['DISTRICT'];
-$county=$row['COUNTY'];
-$province=$row['PROVINCE'];
-	
-	
-if ($i % 10000 == 0){ 
-$dyn_table2 .= ' <thead><tr class="odd gradeX"><th><small>MFL Code</small></th><th><small>Facility</small></th><th><small>District</small></th><th><small>County</small></th><th><small>Province</small></th></thead> <tbody>';
-
-          
-		  $dyn_table2 .= '<td align="left"><small>' .$code . '</small></td>';
-		  $dyn_table2 .= '<td align="left" ><small>' . $facility . '</small></td>';
-		  $dyn_table2 .= '<td align="left" ><small>' . $district . '</small></td>';
-		  $dyn_table2 .= '<td align="left" ><small>' . $county . '</small></td>';
-		  $dyn_table2 .= '<td align="left" ><small>' .$province. '</small></td></tr>';
-		    		   
-		  
-  
-} 
-else{
-	     
-		  $dyn_table2 .= '<td align="left"><small>' .$code . '</small></td>';
-		  $dyn_table2 .= '<td align="left" ><small>' . $facility . '</small></td>';
-		  $dyn_table2 .= '<td align="left" ><small>' . $district . '</small></td>';
-		  $dyn_table2 .= '<td align="left" ><small>' . $county . '</small></td>';
-		  $dyn_table2 .= '<td align="left" ><small>' .$province. '</small></td></tr>';
-		           	
-} 
-       
-	$i++;	
-		
-}	
-	
-$dyn_table2 .= '</tbody></table>';	
-	
-}
-
-
+//$query_rsNR = "SELECT  * FROM facilitynotsubmittedcr where mfl !='99999' ORDER BY facility asc";
+$query_rsNR = "SELECT  * FROM facility_map where xray=1 and mfl !='99999' ORDER BY facility asc";
+$rsNR = mysqli_query($dbConn,$query_rsNR) or die(mysqli_error($dbConn));
+$row_rsNR = mysqli_fetch_assoc($rsNR);
+$totalRows_rsNR = mysqli_num_rows($rsNR);
 ?>
-
-
-
 	<link rel="stylesheet" href="../admin/neon/neon-x/assets/js/jquery-ui/css/no-theme/jquery-ui-1.10.3.custom.min.css"  id="style-resource-1">
 	<link rel="stylesheet" href="../admin/neon/neon-x/assets/css/font-icons/entypo/css/entypo.css"  id="style-resource-2">
 	<link rel="stylesheet" href="../admin/neon/neon-x/assets/css/font-icons/entypo/css/animation.css"  id="style-resource-3">
@@ -81,64 +30,237 @@ $dyn_table2 .= '</tbody></table>';
 
 	<script src="../admin/neon/neon-x/assets/js/jquery-1.10.2.min.js"></script>
     
-	<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-	<!--[if lt IE 9]>
-	  <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-	  <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
-	<![endif]-->
-	
-	<!-- TS1387507087: Neon - Responsive ../admin Template created by Laborator -->
 
-
-<div class="main-content" style="margin-top: 5%;margin-left: .3%">
+<div class="main-content" style="margin-left: 1%">
 
 <div class="row">
-	<div class="col-md-12">
+<div class="col-md-10 col-md-offset-1">
 		
-		<div class="panel panel-gradient" data-collapsed="0">
-		
-			<div class="panel-heading">
-				<div class="panel-title">
-					Mapping of all facilities in the country
-				</div>
-				
-				<div class="panel-options">
-					<a href="#sample-modal" data-toggle="modal" data-target="#sample-modal-dialog-1" class="bg"><i class="entypo-cog"></i></a>
-					<a href="#" data-rel="collapse"><i class="entypo-down-open"></i></a>
-					<a href="#" data-rel="reload"><i class="entypo-arrows-ccw"></i></a>
-					<a href="#" data-rel="close"><i class="entypo-cancel"></i></a>
-				</div>
-			</div>
+		<ul class="nav nav-tabs bordered"><!-- available classes "bordered", "right-aligned" -->
+			<li class="active"><a href="#allFac" data-toggle="tab">All facilities</a></li>
+			<li><a href="#gx" data-toggle="tab">GeneXpert Sites</a></li>
+			<li><a href="#withR" data-toggle="tab">TrueNat Sites</a></li>
+			<li><a href="#withoutR" data-toggle="tab">CAD4TB Sites</a></li>
 			
-			<div class="panel-body">
-				<?php
-				echo $dyn_table2;
-				?>
-
-			<script type="text/javascript">
-				jQuery(document).ready(function($)
-				{
-					$("#table-1").dataTable({
-						"sPaginationType": "bootstrap",
-						"aLengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
-						"bStateSave": true
-					});
-					
-					$(".dataTables_wrapper select").select2({
-						minimumResultsForSearch: -1
-					});
-				});
-			</script>
-			</div>
+		</ul>
 		
+		<div class="tab-content">
+			<div class="tab-pane active" id="allFac">
+				<table class="table table-bordered" id="example">
+					<thead>
+						<tr>
+						<th>MFL CODE</th>
+						<th>FACILITY NAME</th>
+						<th>SUB COUNTY </th>
+						<th>COUNTY</th>
+						<th>PROVINCE</th>
+						</tr>
+					</thead>
+					<tbody>
+						
+								<?php do {   ?> 
+						<tr>
+						
+								<td><?php echo $row_rsUser['mfl']; ?></td>
+								<td><?php echo $row_rsUser['facility']; ?></td>
+								<td><?php echo $row_rsUser['sub_county']; ?></td>
+								<td><?php echo $row_rsUser['county']; ?></td>
+								<td><?php echo $row_rsUser['region']; ?></td>
+								
+							</tr>
+								<?php } while ($row_rsUser = mysqli_fetch_array($rsUser)); ?>
+					</tbody>
+				</table>
+            </div>
+			<div class="tab-pane" id="gx">
+				<table class="table table-bordered" id="gxtable">
+					<thead>
+						<tr>
+						<th>MFL CODE</th>
+						<th>FACILITY NAME</th>
+						<th>SUB COUNTY </th>
+						<th>COUNTY</th>
+						<th>PROVINCE</th>
+						<th>DEVICE MODULES</th>
+						</tr>
+					</thead>
+					<tbody>
+						
+								<?php do {   ?> 
+						<tr>
+						
+								<td><?php echo $row_rsGX['mfl']; ?></td>
+								<td><?php echo $row_rsGX['facility']; ?></td>
+								<td><?php echo $row_rsGX['sub_county']; ?></td>
+								<td><?php echo $row_rsGX['county']; ?></td>
+								<td><?php echo $row_rsGX['region']; ?></td>
+								<td><?php echo $row_rsGX['modular']; ?></td>
+								
+							</tr>
+								<?php } while ($row_rsGX = mysqli_fetch_array($rsGX)); ?>
+					</tbody>
+				</table>
+
+			</div>
+			<div class="tab-pane" id="withR">
+
+				<table class="table table-bordered" id="Rtable">
+					<thead>
+						<tr>
+						<th>MFL CODE</th>
+						<th>FACILITY NAME</th>
+						<th>SUB COUNTY </th>
+						<th>COUNTY</th>
+						
+						</tr>
+					</thead>
+					<tbody>
+						
+								<?php do {   ?> 
+						<tr>
+						
+								<td><?php echo $row_rsR['mfl']; ?></td>
+								<td><?php echo $row_rsR['facility']; ?></td>
+								<td><?php echo $row_rsR['sub_county']; ?></td>
+								<td><?php echo $row_rsR['county']; ?></td>
+								
+								
+							</tr>
+								<?php } while ($row_rsR = mysqli_fetch_array($rsR)); ?>
+					</tbody>
+				</table>
+
+			</div>
+			<div class="tab-pane" id="withoutR">
+				<table class="table table-bordered" id="nrtable">
+					<thead>
+						<tr>
+						<th>MFL CODE</th>
+						<th>FACILITY NAME</th>
+						<th>SUB COUNTY </th>
+						<th>COUNTY</th>
+						</tr>
+					</thead>
+					<tbody>
+						
+								<?php do {   ?> 
+						<tr>
+						
+								<td><?php echo $row_rsNR['mfl']; ?></td>
+								<td><?php echo $row_rsNR['facility']; ?></td>
+								<td><?php echo $row_rsNR['sub_county']; ?></td>
+								<td><?php echo $row_rsNR['county']; ?></td>
+																
+							</tr>
+								<?php } while ($row_rsNR = mysqli_fetch_array($rsNR)); ?>
+					</tbody>
+				</table>
+
+			</div>
+					
 		</div>
-	
+		
+		
 	</div>
+
+
 </div>
+
 	
 
+<script type="text/javascript" language="javascript" src="../jquery-ui-1.10.3/demos/DataTables/media/js/jquery.js"></script>
+<script type="text/javascript" language="javascript" src="../jquery-ui-1.10.3/demos/DataTables/media/js/jquery.dataTables.js"></script>
+<script type="text/javascript" charset="utf-8">
+			
+/* Formating function for row details */
 
-	<link rel="stylesheet" href="../admin/neon/neon-x/assets/js/select2/select2-bootstrap.css"  id="style-resource-1">
+ 
+$(document).ready(function() {
+	$('#Rtable').DataTable( {
+		responsive: true
+	} );
+
+	$('#nrtable').DataTable( {
+		responsive: true
+	} );
+
+	$('#gxtable').DataTable( {
+		responsive: true
+	} );
+	
+	function fnFormatDetails ( oTable, nTr )
+{ 
+    var aData = oTable.fnGetData( nTr );
+    var res='';
+	//location.href = '#?id='+aData[1];
+        $.ajax({
+        type: "POST",
+        url: "../ajax_data/user.php",
+		data: "id="+aData[1],
+        async: true,
+		cache: false,
+        success: function(data) {
+			     res=data;
+			     oTable.fnOpen(nTr,res,'r');
+			    
+			}
+   
+     });  
+ return res;
+	
+}
+	
+    /*
+     * Insert a 'details' column to the table
+     */
+    var nCloneTh = document.createElement( 'th' );
+    var nCloneTd = document.createElement( 'td' );
+    nCloneTd.innerHTML = '<img src="../jquery-ui-1.10.3/demos/DataTables/examples/examples_support/details_open.png">';
+    nCloneTd.className = "center";
+     
+    $('#example thead tr').each( function () {
+        this.insertBefore( nCloneTh, this.childNodes[0] );
+    } );
+     
+    $('#example tbody tr').each( function () {
+        this.insertBefore(  nCloneTd.cloneNode( true ), this.childNodes[0] );
+    } );
+     
+    /*
+     * Initialse DataTables, with no sorting on the 'details' column
+     */
+    var oTable = $('#example').dataTable( {
+       "bJQueryUI":true, "aoColumnDefs": [
+            { "bSortable": false, "aTargets": [ 0 ] }
+        ],
+        "aaSorting": [[1, 'asc']]
+    });
+     
+    /* Add event listener for opening and closing details
+     * Note that the indicator for showing which row is open is not controlled by DataTables,
+     * rather it is done here
+     */
+    $('#example tbody td img').live('click', function () {
+        var nTr = $(this).parents('tr')[0];
+        if ( oTable.fnIsOpen(nTr) )
+        {
+            /* This row is already open - close it */
+            this.src = "../jquery-ui-1.10.3/demos/DataTables/examples/examples_support/details_open.png";
+            oTable.fnClose( nTr );
+        }
+        else
+        {
+            /* Open this row */
+            this.src = "../jquery-ui-1.10.3/demos/DataTables/examples/examples_support/details_close.png";
+            oTable.fnOpen( nTr, fnFormatDetails(oTable, nTr), 'details' );
+        }
+    } );
+} );			
+			
+</script>
+	
+<!-- Footer -->
+<link rel="stylesheet" href="../admin/neon/neon-x/assets/js/select2/select2-bootstrap.css"  id="style-resource-1">
 	<link rel="stylesheet" href="../admin/neon/neon-x/assets/js/select2/select2.css"  id="style-resource-2">
 
 	<script src="../admin/neon/neon-x/assets/js/gsap/main-gsap.js" id="script-resource-1"></script>
@@ -153,23 +275,6 @@ $dyn_table2 .= '</tbody></table>';
 	<script src="../admin/neon/neon-x/assets/js/neon-chat.js" id="script-resource-10"></script>
 	<script src="../admin/neon/neon-x/assets/js/neon-custom.js" id="script-resource-11"></script>
 	<script src="../admin/neon/neon-x/assets/js/neon-demo.js" id="script-resource-12"></script>
-	<script type="text/javascript">
-		
-		var _gaq = _gaq || [];
-		_gaq.push(['_setAccount', 'UA-28991003-3']);
-		_gaq.push(['_setDomainName', 'laborator.co']);
-		_gaq.push(['_setAllowLinker', true]);
-		_gaq.push(['_trackPageview']);
-		
-		(function() {
-		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-		})();
-		
-	</script>
-	
-<!-- Footer -->
 <footer class="main">
 	
 		<div class="pull-right">

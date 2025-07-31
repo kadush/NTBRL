@@ -3,24 +3,11 @@ include("header.php");
 
 @require_once('../connection/db.php'); 
 
-$sql= "SELECT countys.ID as a,countys.name as b,consumption.date as c, sum(consumption.allocated) as d
- FROM `consumption` ,facilitys, `districts` ,`countys`
-WHERE 
-`consumption`.`facility`= `facilitys`.`facilitycode`
-AND  `districts`.`ID` = `facilitys`.`district`
-AND consumption.status=1
-AND `countys`.`ID` = `districts`.`county`";
+$sql= "SELECT ID as a,name as b from countys";
+
 $rssample = mysqli_query($dbConn,$sql) or die(mysqli_error($dbConn));
 $row_rssample = mysqli_fetch_assoc($rssample);
-
-
-
-$maximumyear = GetMaxYear();
-$minyear = GetMinYear();
-
-
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 	
@@ -32,56 +19,39 @@ $minyear = GetMinYear();
 	<link rel="stylesheet" href="../admin/neon//neon-x/assets/css/custom.css"  id="style-resource-6">
 
 	<script src="../admin/neon//neon-x/assets/js/jquery-1.10.2.min.js"></script>
-    
-   
+    <script language="JavaScript" src="../FusionMaps/JSClass/FusionMaps.js"></script>
+       
 
 <div class="main-content" style="margin-top: %;margin-left: .3%">
 	 
 <div class="row">
-	<div class="col-sm-3">
 
-		<div class="panel panel-gradient">
-			<div class="panel-heading">
-				<div class="panel-title">
-					<h4>
-						Allocation Reports
-						<br />
-						<small><?php echo @date('Y'); ?></small>
-					</h4>
-				</div>
-				
-				<div class="panel-options">
-					<a href="#" data-rel="collapse"><i class="entypo-down-open"></i></a>
-<a href="#" data-rel="close"><i class="entypo-cancel"></i></a>
-				</div>
-			</div>
-			<div class="panel-body no-padding">
-				
-					<?php include 'report.php'; ?>
-			</div>
-		</div>
+<?php include('casb.php'); ?>
 
-	</div>
-
-	<div align="center" class="col-sm-9">
+	<div class="col-sm-9">
 		
 		<div class="panel panel-gradient">
 			<div class="panel-heading">
 				<div class="panel-title">
 					<h4>
-						National Catridge Reporting/Allocation Summary
+						Genexpert County Allocation
 					</h4>
 				</div>
 				
 				<div class="panel-options">
 					<a href="#" data-rel="collapse"><i class="entypo-down-open"></i></a>
-					<a href="#" data-rel="close"><i class="entypo-cancel"></i></a>
+                 <a href="#" data-rel="close"><i class="entypo-cancel"></i></a>
 				</div>
 			</div>
-		
 			<div class="panel-body no-padding">
 				
-				<?php include('allocationsummary1.php'); ?>
+				    <div id="mapdiv" align="center"> 
+					    <script type="text/javascript">
+						   var map = new FusionMaps("../FusionMaps/FCMap_KenyaCounty.swf", "mapdiv", "650", "600", "0", "0");
+						   map.setDataURL("../xml/countyall.php");		   
+						   map.render("mapdiv");
+						</script>
+					 </div>
 		</div>
 		</div>
 	</div>
@@ -101,10 +71,6 @@ $minyear = GetMinYear();
 	
 	
 
-
-
-
-	
 
 	<link rel="stylesheet" href="../admin/neon/neon-x/assets/js/select2/select2-bootstrap.css"  id="style-resource-1">
 	<link rel="stylesheet" href="../admin/neon/neon-x/assets/js/select2/select2.css"  id="style-resource-2">

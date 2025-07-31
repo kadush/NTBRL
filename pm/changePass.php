@@ -1,15 +1,14 @@
 <?php 
-	@include("header.php");
-	 require_once('../connection/db.php');
-	//@include('connection/db.php');
-
+	include("header.php");
+	require_once('../connection/db.php');
+	error_reporting(0);
 	if (isset($_POST["btnChange"])) {
-		$username = $_POST['username'];
+		$username = $_SESSION['nm'];
 		$password = md5($_POST['password']);
 		$newpassword = md5($_POST['newpassword']);
 		$repeatnewpassword = md5($_POST['repeatnewpassword']);
-		
-		$result = mysql_query("SELECT password FROM user WHERE username='$username' and password = '$password'");
+				
+		$result = mysqli_query($dbConn,"SELECT password FROM user WHERE name='$username' and password = '$password'");
 		
 		if(!$result) 
 		{ 
@@ -17,9 +16,10 @@
 		  
 		} 
 		
-		if(mysql_num_rows($result)){
+		//exit;
+		if(mysqli_num_rows($result)){
 		    if($newpassword==$repeatnewpassword){
-		        $sql=mysql_query("UPDATE user SET password='$newpassword' where username='$username'");        
+		        $sql=mysqli_query($dbConn,"UPDATE user SET password='$newpassword' where name='$username' and password = '$password'");        
 		        if($sql) 
 		        { 
 		              $suceessmsg = 'Password Successfully Changed' ;
@@ -72,15 +72,11 @@
 	<!-- TS1387507089: Neon - Responsive Admin Template created by Laborator -->
 </head>
 
-<div class="page-container horizontal-menu">
-	
-	
-<div class="page-container" style="padding-left: 0px;">
+<div class="main-content">
 
-<div class="main-content" style="margin-top: 1%;">
 
 <div id="content-row" class="row">
-	<div class="col-md-8 col-md-offset-2" style="margin-top: 0px;">
+	<div class="col-md-8 col-md-offset-2" >
 		
 		<div class="panel panel-gradient" data-collapsed="0">
 		
@@ -116,40 +112,30 @@
 				
 				?><a href="changePass.php" data-rel="close" style="float: right;"><i class="entypo-cancel"></i></a></div>
 				<?php } ?>
-			   <form name="up" class="validate" method="POST" novalidate="novalidate">
-			      <table  class='table table-bordered'>	
-					<tr class='even'>
-					   <th style="text-align:center;"> Current Username :</th>
-					   <td style="text-align:center;" > <input type="text" name="username" size="25" required  class="form-control" autocomplete="off" /></td> 
-					   <th style="text-align:center;"> Current Password :</th>
-					   <td style="text-align:center;" > <input type="password" name="password" required  class="form-control" autocomplete="off"/></td>
-							
-						</tr>	
-					        <tr>
-							<th  style='background-color:#FFFFFF' colspan="4"  >&nbsp;</th>
-							</tr>
-							<tr class='odd'>
-							<th style="text-align:center;">  New Password :</th>
-							<td style="text-align:center;"> <input type="password" name="newpassword" required  class="form-control"   /></td>
-							<th style="text-align:center;"> Confirm password :</th>
-							<td style="text-align:center;"> <input type="password" name="repeatnewpassword"   required  class="form-control"  />
-							
-					        <tr>
-							<th  style='background-color:#FFFFFF'colspan="4" >&nbsp;</th>
-							</tr>
-					        
-					    </tr>
-							 <tr class='odd'>
-					    <td colspan="4">
-					    
-					    <div id="submit" align="center">
-						<input type="submit" name="btnChange" id="btnChange" value="Update Password"  class="btn btn-success"> 
-						<input type="reset"  value="Reset Fields"  class="btn btn-default"> 
-						 </div>
-					
-					    </td>
-					    </tr>
-					</table>
+				   <form name="up" class="validate" method="POST" role="form">
+						    <div class="col-md-4">
+								<div class="form-group">
+								<label>Current Password :</label>
+						    	<input type="password" name="password" required  class="form-control" autocomplete="off"/>
+								</div>
+							</div>
+							 <div class="col-md-4">
+								<div class="form-group">
+								<label>New Password :</label>
+						    	<input type="password" name="newpassword" required  class="form-control"   />
+								</div>
+							</div>
+							 <div class="col-md-4">
+								<div class="form-group">
+								<label>Confirm New Password :</label>
+						    	<input type="password" name="repeatnewpassword"   required  class="form-control"  />
+								</div>
+							</div><br />
+							  <div id="submit" align="center">
+								<input type="submit" name="btnChange" id="btnChange" value="Update Password"  class="btn btn-success"> 
+								<input type="reset"  value="Reset Fields"  class="btn btn-default"> 
+							  </div>
+					     
 			       </form>
 				
 			</div>
@@ -157,6 +143,7 @@
 		</div>
 	
 	</div>
+	
 	
 </div>
 

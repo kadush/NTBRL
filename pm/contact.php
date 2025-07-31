@@ -1,53 +1,18 @@
 <?php
 include('header.php');
 @require_once('../connection/db.php'); 
+//ORDER BY `countys`.`ID` ASC
 
-/* ****************************************************/
-$sql= "SELECT `section4`.`facility` AS MFL, `facilitys`.`name` AS FACILITY
-FROM `section4` , `facilitys`
-WHERE `section4`.`facility` = `facilitys`.`facilitycode`
-GROUP BY `section4`.`facility`
-
-";
-
-$query=mysqli_query($dbConn,$sql);
-$numrows=@mysqli_num_rows($query);
-
-if(!$numrows){
-
-$dyn_table3 .= '<td colspan="4" align="center"> No Data to Display </td></tr>';
-}
-else{
-$i=0;
-$dyn_table3 = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="example" width="100%">';	
-while($row=mysqli_fetch_assoc($query)){
+$query_rssample = "SELECT distinct mfl as fcode,facilitys.name AS fname, districts.name AS di, countys.name AS co
+FROM `user` , `facilitys` , `districts`,countys
+WHERE `user`.`mfl` = `facilitys`.`facilitycode`
+AND `districts`.`ID` = `facilitys`.`district`
+AND `districts`.`county` = `countys`.`ID`
+And user.category='3' and mfl>2";
+$rssample = mysqli_query($dbConn,$query_rssample) or die(mysqli_error($dbConn));
+$row_rssample = mysqli_fetch_assoc($rssample);
+$total = mysqli_num_rows($rssample);
 	
-$mfl=$row['MFL'];
-$facility=$row['FACILITY'];	
-	
-if ($i % 10000 == 0){ 
-$dyn_table3 .= '<thead><tr class="odd gradeX"><th>Mfl</th><th>Facility</th></thead> <tbody>';
-
-          $dyn_table3 .= '<td align="left">' .$mfl . '</td>';
-		  $dyn_table3 .= '<td align="left">' .$facility . '</td></tr>';
-		 
-		
-} 
-else{
-	      $dyn_table3 .= '<td align="left">' .$mfl . '</td>';
-		  $dyn_table3 .= '<td align="left">' .$facility . '</td></tr>';
-		   
-} 
-       
-	  
-	$i++;	
-		
-}	
-	
-$dyn_table3 .= '</tbody></table>';	
-	
-}
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -82,7 +47,7 @@ $(document).ready(function() {
 	//location.href = '#?id='+aData[1];
         $.ajax({
         type: "POST",
-       url: "../ajax_data/test.php",
+        url: "../ajax_data/conta.php",
 		data: "id="+aData[1],
         async: true,
 		cache: false,
@@ -148,14 +113,14 @@ $(document).ready(function() {
 
 <div class="main-content">
 	 
-<div class="row" style="margin-top: -3%;margin-left: 16%">
-	<div align="center" class="col-sm-9">
+<div class="row">
+	<div class="col-sm-11" style="margin-top: 1.5%;margin-left: 4%;">
 		
 		<div class="panel panel-gradient">
 			<div class="panel-heading">
 				<div class="panel-title">
 					<h4>
-						GeneXpert Sites In The County
+						GeneXpert Sites Contact Persons
 					</h4>
 				</div>
 				
@@ -167,16 +132,41 @@ $(document).ready(function() {
 		
 			<div class="panel-body no-padding">
 				
-				<?php
-				echo $dyn_table3;
-				?>		
+				<table  class="display" id="example" >
+					<thead>
+						<tr>
+							
+				            <th style="text-align: center" >MFL Code </th>
+				            <th style="text-align: center" >Facility Name</th>
+				            <th style="text-align: center" >District</th>
+				            <th style="text-align: center" >County</th>
+				            				            
+				         </tr>
+					</thead>
+					<tbody>
+						
+							 <?php do { ?>      
+				<tr class="odd gradeX">
+				 
+				
+				<td style="text-align: center"> <?php echo $row_rssample['fcode']; ?></td>
+				<td style="text-align: center"> <?php echo $row_rssample['fname']; ?></td>
+				<td style="text-align: center"> <?php echo $row_rssample['di']; ?></td>
+				<td style="text-align: center"> <?php echo $row_rssample['co']; ?> </td>
+				</tr>
+				      <?php } while ($row_rssample = mysqli_fetch_assoc($rssample)); ?> 
+				      
+				       <?php  ?>  
+						
+					</tbody>
+				</table>					
 		</div>
 		</div>
 	</div>
 	
 </div>
 <!-- Footer -->
-<footer class="main" style="margin-left: 5%;">
+<footer class="main" style="margin-left: %">
 	
 		<div class="pull-right">
 		<?php
@@ -186,7 +176,13 @@ $(document).ready(function() {
 	
 </footer>		
 </div>
+	
+	
 
+
+
+
+	
 
 	<link rel="stylesheet" href="../admin/neon/neon-x/assets/js/select2/select2-bootstrap.css"  id="style-resource-1">
 	<link rel="stylesheet" href="../admin/neon/neon-x/assets/js/select2/select2.css"  id="style-resource-2">

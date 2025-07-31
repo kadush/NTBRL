@@ -1,14 +1,35 @@
 <?php
 include('header.php');
+@require_once('../connection/db.php'); 
 	if (isset($_GET['id'])){
 		$countyID = $_GET['id'];
 		  
 	}
-?>
-<?php
-@require_once('../connection/db.php'); 
+//getting name of county
+
+    $sqlCN="SELECT name AS cN FROM countys WHERE ID ='$countyID'";
+	$qCN=mysqli_query($dbConn,$sqlCN,$conn ) or die(mysqli_error($dbConn));
+	$rwCN=mysqli_fetch_assoc($qCN);
+    $countyname=$rwCN['cN'];
 
 
+$query_rssample = "SELECT 
+countys.ID as ID,countys.name AS name,
+COUNT(*) AS Totaltest,
+sum(CASE WHEN Test_Result = 'positive' THEN 1 ELSE 0 END ) AS mtbpos,
+sum( CASE WHEN Test_Result = 'negative' THEN 1 ELSE 0 END ) AS MTBNEG,
+sum( CASE WHEN mtbRif='positive' THEN 1 ELSE 0 END ) AS mtbrif,
+sum( CASE WHEN Test_Result = 'ERROR' OR Test_Result = 'Invalid' OR Test_Result = 'Indeterminate' THEN 1 ELSE 0 END ) AS err
+
+FROM sample1 
+RIGHT JOIN `facilitys` ON `sample1`.`facility` = `facilitys`.`facilitycode`
+RIGHT JOIN `districts` ON `districts`.`ID` = `facilitys`.`district`
+RIGHT JOIN `countys` ON `countys`.`ID` = `districts`.`county`
+WHERE  sample1.cond='1'
+Group by countys.name";
+$rssample = mysqli_query($dbConn,$query_rssample, $ntrl) or die(mysqli_error($dbConn));
+$row_rssample = mysqli_fetch_assoc($rssample);
+$total = mysqli_num_rows($rssample);
 
 $sql="SELECT County,total
 FROM(
@@ -23,9 +44,9 @@ LEFT  JOIN `provinces` ON `countys`.`province` = `provinces`.`ID`
 WHERE `countys`.`ID` ='$countyID'
 Group by County
 )x" ;	
-$query=mysql_query($sql,$conn ) or die(mysql_error());
-$rs=mysql_fetch_assoc($query);
-if( mysql_num_rows($query)==0)
+$query=mysqli_query($dbConn,$sql,$conn ) or die(mysqli_error($dbConn));
+$rs=mysqli_fetch_assoc($query);
+if( mysqli_num_rows($query)==0)
    {
 		 $errormsg= 'There are no tests done in ' .$countyname. ' County';
    } 
@@ -35,7 +56,7 @@ if( mysql_num_rows($query)==0)
  `sample1`.`facility` AS a,
 `facilitys`.`name` AS b, 
 `districts`.`name` AS c,
-`sample1`.`Instrument_SN` AS d,
+`sample1`.`GXSN` AS d,
 `countys`.`name` as e
 FROM `sample1` ,`facilitys`, `districts` ,`countys`
 WHERE 
@@ -43,11 +64,125 @@ WHERE
 AND  `districts`.`ID` = `facilitys`.`district`
 AND `countys`.`ID` = `districts`.`county`
 AND `countys`.`ID`='$countyID'
-GROUP BY `facilitys`.`name`,`sample1`.`facility`";	
-$q=mysql_query($sql,$conn ) or die(mysql_error());
-$r=mysql_fetch_assoc($q);
+GROUP BY `facilitys`.`name`";	
+$q=mysqli_query($dbConn,$sql,$conn ) or die(mysqli_error($dbConn));
+$r=mysqli_fetch_assoc($q);
 
-       
+//used in filters  
+$mwaka = $_GET['year'];
+$mwezi = $_GET['mwezi'];
+
+if (isset($_GET['filter'])) {
+	$filter = $_GET['filter'];
+	if ($filter == 1)//LAST 3 MONTHS
+	{
+		$todate = @date("Y-m-d");
+		// current date
+		$fromdate = @date('Y-m-d', strtotime('-3 month'));
+		$displayfromdate = @date("d-M-Y", strtotime($fromdate));
+		$displaytodate = @date("d-M-Y", strtotime($todate));
+		$title = "Last 3 Months";
+		$currentmonth = @date("m");
+		$currentyear = @date("Y");
+		$colspan = 3;
+		$mapwidth = 540;
+
+	} elseif ($filter == 7)//last 6 months
+	{
+		$todate = @date("Y-m-d");
+		// current date
+		$fromdate = @date('Y-m-d', strtotime('-6 month'));
+		$displayfromdate = @date("d-M-Y", strtotime($fromdate));
+		$displaytodate = @date("d-M-Y", strtotime($todate));
+		$title = "Last 6 Months";
+		$currentmonth = @date("m");
+		$currentyear = @date("Y");
+		$colspan = 6;
+		$mapwidth = 540;
+	} elseif ($filter == 0)//last submission
+	{
+		$filter = 0;
+		$colspan = 6;
+		$mapwidth = 540;
+		$currentmonth = GetMaxMonthbasedonMaxYear($mwezi);
+		$displaymonth = GetMonthName($currentmonth);
+		$currentyear = GetMaxYear($mwaka);
+		$title = "Last Upload :" . $displaymonth . ' - ' . $currentyear;
+		//get current month and year
+	} elseif ($filter == 3)//month/year
+	{
+		$displaymonth = GetMonthName($mwezi);
+		$title = $displaymonth . ' - ' . $mwaka;
+		//get current month and year
+		$currentmonth = $mwezi;
+		$currentyear = $mwaka;
+		$colspan = 1;
+		$mapwidth = 540;
+	} elseif ($filter == 4)//year
+	{
+		$title = $mwaka;
+		//get current month and year
+		$currentmonth = "";
+		//get current month and year
+		$currentyear = $mwaka;
+		$colspan = 12;
+		$mapwidth = 400;
+	}
+	elseif ($filter == 8)//all
+	{
+		$currentmonth = GetMaxMonthbasedonMaxYear($mwezi);
+		$currentyear = GetMaxYear($mwaka);
+		$displaymonth = GetMonthName($currentmonth);
+		$minyear = GetMinYear();
+		$title = "Cumulative Data : " . $minyear . ' to ' . $displaymonth . ' - ' . $currentyear;
+		
+	}
+} else {
+	if ($_REQUEST['submitform']) {
+		$filter = 2;
+		$fromfilter = $_GET['fromfilter'];
+		$tofilter = $_GET['tofilter'];
+		$displayfromfilter = @date("d-M-Y", strtotime($fromfilter));
+		$displaytofilter = @date("d-M-Y", strtotime($tofilter));
+		$title = $displayfromfilter . "  to  " . $displaytofilter;
+		$currentmonth = @date("m");
+		$currentyear = @date("Y");
+		$colspan = 1;
+		$mapwidth = 540;
+	} else {
+		if (isset($mwaka)) {
+			if (isset($mwezi)) {
+				$filter = 3;
+				$displaymonth = GetMonthName($mwezi);
+				$title = $displaymonth . ' - ' . $mwaka;
+				//get current month and year
+				$currentmonth = $mwezi;
+				$currentyear = $mwaka;
+				$colspan = 1;
+				$mapwidth = 540;
+			} else {
+				$filter = 4;
+				$title = $mwaka;
+				//get current month and year
+				$currentmonth = "";
+				//get current month and year
+				$currentyear = $mwaka;
+				$colspan = 12;
+				$mapwidth = 400;
+			}
+		} else  {	
+		    $filter = 0;
+			$colspan = 6;
+			$mapwidth = 540;
+
+			$currentmonth = GetMaxMonthbasedonMaxYear();
+			$displaymonth = GetMonthName($currentmonth);
+			$currentyear = GetMaxYear();
+			$title = "Last Upload :" . $displaymonth . ' - ' . $currentyear;
+			//get current month and year
+		}
+	}
+}       
 /* ****************************************************/
 $TTC=totalTestsCountyWise($countyID,$filter,$currentmonth,$currentyear,$fromfilter,$tofilter,$fromdate,$todate);
 $ageC=totalTestsPerCountyByAge($countyID, $filter, $currentmonth, $currentyear, $fromfilter, $tofilter, $fromdate, $todate); 
@@ -68,9 +203,9 @@ $ptypeC=totalTestsPerCountyByPtype($countyID,$filter,$currentmonth,$currentyear,
 
 	<script src="../admin/neon//neon-x/assets/js/jquery-1.10.2.min.js"></script>
     <script language="JavaScript" src="../FusionMaps/JSClass/FusionMaps.js"></script>
-    <script language="JavaScript" src="../FusionCharts/JSClass/FusionCharts.js"></script>
+    <script language="JavaScript" src="../FusionCharts/FusionCharts.js"></script>
     
-<div class="main-content" style="margin-top: 5%;margin-left: .3%">
+<div class="main-content" style="margin-top: %;margin-left: .3%">
 	<ol class="breadcrumb" class="navbar-fixed-top">
 		<form id="customForm"  method="GET" action="" >
 <div><strong> Date Range: </strong>&nbsp;<U><B><font color="#0000CC"><?php echo $title; ?></B></U>   |<small>  
@@ -157,6 +292,7 @@ if (isset($_GET['id'])){
 
 <div class="col-md-2">
 <input class="form-control datepicker" type="text" data-format="yyyy-mm-dd" id="tofilter" name="tofilter" size="18" />
+<input type="hidden" id="id" name="id"  value="<?php echo $countyID ; ?>" />
 </div>
 <input type="submit" id="submitform" name="submitform" value="Filter" class="btn btn-green"/>
 </div>
@@ -164,7 +300,49 @@ if (isset($_GET['id'])){
 
 </form>
 </ol>
-
+<hr />
+<div class="row">
+		<form id="customForm"  method="GET" action="">
+		 <table border="0" class="table table-striped" style="width: 600px;  margin-left: auto;  margin-right: auto; " >
+		  	<tr>
+		  		<td align="center"><span class="label label-default">Select County</span></td>
+		  		 <td align="center">
+		  		 	<div class="col-sm-6">
+		  		 		
+			  			<select name="id" id="id" class="form-control" >
+			  			<option value="">Select One County</option>
+					    <?php do{ 	?>
+					    <option value="<?php echo $row_rssample ['ID'];?>"> <?php echo $row_rssample ['name'];?> County</option>
+						<?php } while ($row_rssample = mysqli_fetch_assoc($rssample));?>
+					    </select> 
+				    </div>
+				   
+			<!--	</td>
+		  		
+		  		 <td align="left"><span class="label label-default">Select year</span></td>
+		  			<td align="left">
+					<?php
+						$years = range ($maximumyear,$minyear); 
+						
+						// Make the years pull-down menu.
+						echo '<select  class="form-control" name="year">';
+					
+							foreach ($years as $value)
+						 	{
+								echo "<option value=\"$value\">$value</option>\n";
+							}
+							
+						echo '</select>';
+				   
+				  ?>
+				</td> 
+		  		<td>-->
+		  			<input type="submit"  value="Filter" class="btn btn-green"/>
+		  		</td>
+		  	</tr>
+		  </table>
+	</form>
+    </div>
  <?php if ($errormsg !="")
 					{
 					?> 
@@ -201,7 +379,7 @@ if (isset($_GET['id'])){
 				<div id="chartdivtre"> <?php $kad="id=".$countyID."%26mwaka=".$currentyear; ?>
 				   <script type="text/javascript">
 				    
-				    var myChart = new FusionCharts("../FusionCharts/Charts/MSLine.swf", "myChartId", "525", "345", "0", "0");
+				    var myChart = new FusionCharts("MSLine", "myChartId", "525", "345");
 				    myChart.setDataURL("../xml1/countytrendline.php?<?php echo $kad; ?>");
 				    myChart.render("chartdivtre");
 				    
@@ -288,14 +466,14 @@ if (isset($_GET['id'])){
 					<?php if (($ageC[0]=='') and ($ageC[1]=='') and ($ageC[2]=='')) { ?>
 						
 					<script type="text/javascript">
-					var myChart = new FusionCharts("../FusionCharts/Charts/Doughnut2D.swf?ChartNoDataText=No data to display", "myChartnat", "300", "133", "0", "0");
+					var myChart = new FusionCharts("Doughnut2D", "myChartnat", "310", "133");
 					myChart.setDataXML("<chart></chart>");
 		            myChart.render("chartnat1");
 				    </script>
 						
 					<?php } else { ?>
 						<script type="text/javascript">
-					    var myChart = new FusionCharts("../FusionCharts/Charts/Doughnut2D.swf", "myChartnat", "300", "133", "0", "0");
+					    var myChart = new FusionCharts("Doughnut2D", "myChartnat", "310", "133");
 					    myChart.setDataXML('<chart  bgcolor="FFFFFF"   showborder="0"  palette="2" animation="1"  pieSliceDepth="30" startingAngle="125"><set value="<?php echo $ageC[0]; ?>" label="Above 15 Yrs" color="C295F2"/><set value="<?php echo $ageC[1]; ?>" label="Btwn 5-15 Yrs" color="#ADFF2F"/><set value="<?php echo $ageC[2]; ?>" label="Below 5 Yrs" color="00ACE8"/><styles><definition><style type="font" name="CaptionFont" size="11" color="666666" /><style type="font" name="SubCaptionFont" bold="0" /></definition><application><apply toObject="caption" styles="CaptionFont" /><apply toObject="SubCaption" styles="SubCaptionFont" /></application></styles></chart>');
 					    myChart.render("chartnat1");
 					    
@@ -332,7 +510,7 @@ if (isset($_GET['id'])){
 					<?php if (($genderC[0]=='') and ($genderC[1]=='') and ($genderC[2]=='')) { ?> 
 						
 					<script type="text/javascript">
-					var myChart = new FusionCharts("../FusionCharts/Charts/Pie3D.swf?ChartNoDataText=No data to display", "myChartnat", "300", "133", "0", "0");
+					var myChart = new FusionCharts("Pie3D", "myChartnat", "310", "133");
 					myChart.setDataXML("<chart></chart>");
 		            myChart.render("chartnat2");
 				    </script>		
@@ -340,7 +518,7 @@ if (isset($_GET['id'])){
 					<?php } else { ?>
 					
          		<script type="text/javascript">
-			   var myChart = new FusionCharts("../FusionCharts/Charts/Pie3D.swf", "myChartnat", "300", "133", "0", "0");
+			   var myChart = new FusionCharts("Pie3D", "myChartnat", "310", "133");
 			   myChart.setDataXML('<chart bgcolor="FFFFFF" showborder="0" palette="2" animation="1"  pieSliceDepth="30" startingAngle="125" ><set value="<?php echo $genderC[0]; ?>" label="Male" color="C295F2"/><set value="<?php echo $genderC[1]; ?>" label="Female" color="#ADFF2F"/><set value="<?php echo $genderC[2]; ?>" label="Not specified" color="00ACE8"/><styles><definition><style type="font" name="CaptionFont" size="11" color="666666" /><style type="font" name="SubCaptionFont" bold="0" /></definition><application><apply toObject="caption" styles="CaptionFont" /><apply toObject="SubCaption" styles="SubCaptionFont" /></application></styles></chart>');
 			   myChart.render("chartnat2");
 			    
@@ -445,7 +623,7 @@ if (isset($_GET['id'])){
 			<td style="text-align:center"><?php echo $TTC[1]  ;?></td>
 			<td style="text-align:center"><?php echo $TTC[2] ;?></td>
 			<td style="text-align:center"><?php echo $TTC[3] ;?></td>
-			<td style="text-align:center"><?php echo $TTC[64] ;?></td>
+			<td style="text-align:center"><?php echo $TTC[76] ;?></td>
 			</tr>
 			</tbody>
 			</table>
@@ -476,14 +654,14 @@ if (isset($_GET['id'])){
 				 <?php if (($hstatusC[0]=='') and ($hstatusC[1]=='') and ($hstatusC[2]=='')) { ?> 
 						
 					<script type="text/javascript">
-					var myChart = new FusionCharts("../FusionCharts/Charts/Pie2D.swf?ChartNoDataText=No data to display", "myChartnat", "300", "140", "0", "0");
+					var myChart = new FusionCharts("Pie2D", "myChartnat", "310", "140");
 					myChart.setDataXML("<chart></chart>");
 		            myChart.render("chartnat3");
 				    </script>		
 						
 					<?php } else { ?> 
         		<script type="text/javascript">
-      			var myChart = new FusionCharts("../FusionCharts/Charts/Pie2D.swf", "myChartnat", "300", "140", "0", "0");
+      			var myChart = new FusionCharts("Pie2D", "myChartnat", "310", "140");
 			    myChart.setDataXML('<chart  bgcolor="FFFFFF"   showborder="0"  palette="2" animation="1"   pieSliceDepth="30" startingAngle="125"> <set value="<?php echo $hstatusC[0]; ?>" label="Positive" color="C295F2"/><set value="<?php echo $hstatusC[1]; ?>" label="Negative" color="#ADFF2F"/><set value="<?php echo $hstatusC[2]; ?>" label="Not specified" color="00ACE8"/><styles><definition><style type="font" name="CaptionFont" size="11" color="666666" /><style type="font" name="SubCaptionFont" bold="0" /></definition><application><apply toObject="caption" styles="CaptionFont" /><apply toObject="SubCaption" styles="SubCaptionFont" /></application></styles></chart>');
 			    myChart.render("chartnat3"); 
 			    </script> 
@@ -553,7 +731,7 @@ if (isset($_GET['id'])){
 <br />
 <div class="row">
 	
-	<div class="col-sm-5">
+	<!-- <div class="col-sm-5">
 		
 		<div class="panel panel-gradient">
 			<div class="panel-heading">
@@ -574,17 +752,17 @@ if (isset($_GET['id'])){
 			<div id="chartp"  align="center"> 
 				
 	         	<script type="text/javascript">
-	      		var myChart = new FusionCharts("../FusionCharts/Charts/StackedColumn2D.swf", "myChartnat", "500", "300", "0", "0");
-	     	 	myChart.setDataXML('<chart palette="2" yAxisName="# of Patients"  showLabels="1" showvalues="0"  numberPrefix="" showSum="0" decimals="0" useRoundEdges="1" legendBorderAlpha="0" bgcolor="FFFFFF" showborder="0"><categories><category label="sputum smear-positive relapse" /><category label="sputum smear-negative relapse" /><category label="Return after defaulting" /><category label="Failure 1-st line treatment" /><category label="Failure re-treatment" /><category label="New Patients" /><category label="New case PTB" /><category label="MDR TB Contact" /><category label="Refugees SS+ve" /><category label="HCWs" /><category label="Hiv(+) & Smear(-)" /></categories><dataset seriesName="MTB Pos" color="AFD8F8" showValues="0"><set value="<?php echo $ptypeC[0]; ?>" /><set value="<?php echo $ptypeC[2]; ?>" /><set value="<?php echo $ptypeC[4]; ?>" /><set value="<?php echo $ptypeC[6]; ?>" /><set value="<?php echo $ptypeC[8]; ?>" /><set value="<?php echo $ptypeC[10]; ?>" /><set value="<?php echo $ptypeC[12]; ?>" /><set value="<?php echo $ptypeC[14]; ?>" /><set value="<?php echo $ptypeC[16]; ?>" /><set value="<?php echo $ptypeC[18]; ?>" /><set value="<?php echo $ptypeC[20]; ?>" /></dataset><dataset seriesName="Rif Resistant" color="F6BD0F" showValues="0"><set value="<?php echo $ptypeC[1] ; ?>" /><set value="<?php echo $ptypeC[3] ; ?>" /><set value="<?php echo $ptypeC[5] ; ?>" /><set value="<?php echo $ptypeC[7] ; ?>" /><set value="<?php echo $ptypeC[9] ; ?>" /><set value="<?php echo $ptypeC[11] ; ?>" /><set value="<?php echo $ptypeC[13] ; ?>" /><set value="<?php echo $ptypeC[15] ; ?>" /><set value="<?php echo $ptypeC[17] ; ?>" /><set value="<?php echo $ptypeC[19] ; ?>" /><set value="<?php echo $ptypeC[21] ; ?>" /></dataset></chart>');
+	      		var myChart = new FusionCharts("StackedColumn2D", "myChartnat", "550", "310");
+	     	 	myChart.setDataXML('<chart palette="2" yAxisName="# of Patients"  showLabels="1" showvalues="0"  numberPrefix="" showSum="0" decimals="0" useRoundEdges="1" legendBorderAlpha="0" bgcolor="FFFFFF" showborder="0"><categories><category label="sputum smear-positive relapse" /><category label="sputum smear-negative relapse" /><category label="Return after defaulting" /><category label="Failure 1-st line treatment" /><category label="Failure re-treatment" /><category label="Extra pulmonary" /><category label="New case PTB" /><category label="MDR TB Contact" /><category label="Refugees SS+ve" /><category label="HCWs" /><category label="Hiv Symp" /></categories><dataset seriesName="MTB Pos" color="AFD8F8" showValues="0"><set value="<?php echo $ptypeC[0]; ?>" /><set value="<?php echo $ptypeC[2]; ?>" /><set value="<?php echo $ptypeC[4]; ?>" /><set value="<?php echo $ptypeC[6]; ?>" /><set value="<?php echo $ptypeC[8]; ?>" /><set value="<?php echo $ptypeC[10]; ?>" /><set value="<?php echo $ptypeC[12]; ?>" /><set value="<?php echo $ptypeC[14]; ?>" /><set value="<?php echo $ptypeC[16]; ?>" /><set value="<?php echo $ptypeC[18]; ?>" /><set value="<?php echo $ptypeC[20]; ?>" /></dataset><dataset seriesName="Rif Resistant" color="F6BD0F" showValues="0"><set value="<?php echo $ptypeC[1] ; ?>" /><set value="<?php echo $ptypeC[3] ; ?>" /><set value="<?php echo $ptypeC[5] ; ?>" /><set value="<?php echo $ptypeC[7] ; ?>" /><set value="<?php echo $ptypeC[9] ; ?>" /><set value="<?php echo $ptypeC[11] ; ?>" /><set value="<?php echo $ptypeC[13] ; ?>" /><set value="<?php echo $ptypeC[15] ; ?>" /><set value="<?php echo $ptypeC[17] ; ?>" /><set value="<?php echo $ptypeC[19] ; ?>" /><set value="<?php echo $ptypeC[21] ; ?>" /></dataset></chart>');
 	     		myChart.render("chartp");
 	            </script> 
 			</div>
 
 		</div>
 		
-	</div>
+	</div> -->
 
-	<div class="col-sm-7">
+	<div class="col-sm-12">
 		
 		<div class="panel panel-gradient">
 			<div class="panel-heading">
@@ -606,17 +784,21 @@ if (isset($_GET['id'])){
 				<thead>
 					<tr>
 					<td  style="text-align:center">#</td>
-					<td style="text-align:center">sputum smear (+) relapse</td>
-					<td style="text-align:center">sputum smear (-) relapse</td>
+					<td style="text-align:center">Smear positive at 2 months</td>
+					<td style="text-align:center">All smear negative PTB cases</td>
 					<td style="text-align:center">Return after defaulting</td>
 					<td style="text-align:center">Failure 1st line treatment</td>
 					<td style="text-align:center">Failure re-treatment</td>
-					<td style="text-align:center">New Patients</td>
-					<td style="text-align:center">New case PTB</td>
-					<td style="text-align:center">MDR TB Contact</td>
+					<td style="text-align:center">Extra Pulmonary</td>
+					<td style="text-align:center">New presumptive PTB</td>
+					<td style="text-align:center">DR TB Contact</td>
 					<td style="text-align:center">Refugees SS+ve</td>
 					<td style="text-align:center">HCWs</td>
-					<td style="text-align:center">Hiv (+) & Smear (-)</td>
+					<td style="text-align:center">Hiv (+)ve with symptoms of TB</td>
+					<td style="text-align:center">Relapse</td>
+					<td style="text-align:center">Prisoners with TB symptoms</td>
+					<td style="text-align:center">Patients who develop TB while on IPT</td>
+					<td style="text-align:center">No Patient type</td>
 					</tr>
 					</thead>
 					<tbody>
@@ -633,6 +815,10 @@ if (isset($_GET['id'])){
 					<td style="text-align:center"><?php echo $TTC[55] ;?></td>
 					<td style="text-align:center"><?php echo $TTC[58] ;?></td>
 					<td style="text-align:center"><?php echo $TTC[61] ;?></td>
+					<td style="text-align:center"><?php echo $TTC[64] ;?></td>
+					<td style="text-align:center"><?php echo $TTC[67] ;?></td>
+					<td style="text-align:center"><?php echo $TTC[70] ;?></td>
+					<td style="text-align:center"><?php echo $TTC[73] ;?></td>
 
 					</tr>
 					<tr>
@@ -648,6 +834,10 @@ if (isset($_GET['id'])){
 					<td style="text-align:center"><?php echo $TTC[56] ;?></td>
 					<td style="text-align:center"><?php echo $TTC[59] ;?></td>
 					<td style="text-align:center"><?php echo $TTC[62] ;?></td>
+					<td style="text-align:center"><?php echo $TTC[65] ;?></td>
+					<td style="text-align:center"><?php echo $TTC[68] ;?></td>
+					<td style="text-align:center"><?php echo $TTC[71] ;?></td>
+					<td style="text-align:center"><?php echo $TTC[74] ;?></td>
 					</tr>
 					<tr>
 					<td style="text-align:center">Rif Resistant</td>
@@ -662,6 +852,10 @@ if (isset($_GET['id'])){
 					<td style="text-align:center"><?php echo $TTC[57] ; ?></td>
 					<td style="text-align:center"><?php echo $TTC[60] ; ?></td>
 					<td style="text-align:center"><?php echo $TTC[63] ; ?></td>
+					<td style="text-align:center"><?php echo $TTC[66] ; ?></td>
+					<td style="text-align:center"><?php echo $TTC[69] ; ?></td>
+					<td style="text-align:center"><?php echo $TTC[72] ; ?></td>
+					<td style="text-align:center"><?php echo $TTC[75] ;?></td>
 					</tr>
 					</tbody>
 					</table>
@@ -690,7 +884,7 @@ if (isset($_GET['id'])){
 				
 			<table class="table table-striped">
 				<thead>
-					<?php if( mysql_num_rows($q)>0)
+					<?php if( mysqli_num_rows($q)>0)
             { ?>
 					<tr>
 					<th style="text-align:center;">Mfl Code</th>
@@ -701,12 +895,12 @@ if (isset($_GET['id'])){
 					<?php do { ?>
 					<tbody>
 					<tr>
-					<td style="text-align:center"><?php echo $r['a']; ?></td>
+					<td style="text-align:center"><a href="facility.php?id=<?php echo $r['a']; ?>"><?php echo $r['a']; ?></a></td>
 				    <td style="text-align:center"><?php echo $r['b']; ?></td>
 				    <td style="text-align:center"><?php echo $r['c']; ?></td>
 				    <td style="text-align:center"><?php echo $r['d']; ?></td>
 					</tr>
-					<?php } while($r=mysql_fetch_assoc($q)); } else 
+					<?php } while($r=mysqli_fetch_assoc($q)); } else 
    {
 		 echo '<div class="alert alert-warning">There are no GeneXpert Sites in ' .$countyname. ' County</div>';
    }  ?>

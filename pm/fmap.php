@@ -2,16 +2,24 @@
 include('header.php');
 @require_once('../connection/db.php'); 
 //ORDER BY `countys`.`ID` ASC
-mysql_select_db($database, $ntrl);
-$query_rssample = "SELECT `countys`.`ID` AS ID, `countys`.`name` AS name 
-FROM `countys`,`sample1` ,facilitys, `districts` 
-WHERE `sample1`.`facility`= `facilitys`.`facilitycode`
-AND  `districts`.`ID` = `facilitys`.`district`
-AND `countys`.`ID` = `districts`.`county`
-Group by  countys.ID";
-$rssample = mysql_query($query_rssample, $ntrl) or die(mysql_error());
-$row_rssample = mysql_fetch_assoc($rssample);
-$total = mysql_num_rows($rssample);
+mysqli_select_db($database, $ntrl);
+$query_rssample = "SELECT 
+countys.ID as ID,countys.name AS name,
+COUNT(*) AS Totaltest,
+sum(CASE WHEN Test_Result = 'positive' THEN 1 ELSE 0 END ) AS mtbpos,
+sum( CASE WHEN Test_Result = 'negative' THEN 1 ELSE 0 END ) AS MTBNEG,
+sum( CASE WHEN mtbRif='positive' THEN 1 ELSE 0 END ) AS mtbrif,
+sum( CASE WHEN Test_Result = 'ERROR' OR Test_Result = 'Invalid' OR Test_Result = 'Indeterminate' THEN 1 ELSE 0 END ) AS err
+
+FROM sample1 
+RIGHT JOIN `facilitys` ON `sample1`.`facility` = `facilitys`.`facilitycode`
+RIGHT JOIN `districts` ON `districts`.`ID` = `facilitys`.`district`
+RIGHT JOIN `countys` ON `countys`.`ID` = `districts`.`county`
+WHERE  sample1.cond='1'
+Group by countys.ID";
+$rssample = mysqli_query($dbConn,$query_rssample, $ntrl) or die(mysqli_error($dbConn));
+$row_rssample = mysqli_fetch_assoc($rssample);
+$total = mysqli_num_rows($rssample);
 	
 ?>
 <!DOCTYPE html>
@@ -113,8 +121,8 @@ $(document).ready(function() {
 
 <div class="main-content">
 	 
-<div class="row" style="margin-top: -3%;margin-left: 16%">
-	<div align="center" class="col-sm-9">
+<div class="row">
+	<div class="col-sm-11" style="margin-top: 1.5%;margin-left: 4%;">
 		
 		<div class="panel panel-gradient">
 			<div class="panel-heading">
@@ -132,13 +140,18 @@ $(document).ready(function() {
 		
 			<div class="panel-body no-padding">
 				
-				<table  class="display" id="example"  >
+				<table  class="display" id="example" >
 					<thead>
 						<tr>
 							
 				            <th style="text-align: center" >County ID </th>
 				            <th style="text-align: center" >County Name</th>
-				            <th style="text-align: center" >Action </th>
+				            <th style="text-align: center" >Total Tests</th>
+				            <th style="text-align: center" >MTB Positive</th>
+				            <th style="text-align: center" >MTB Negative</th>
+				            <th style="text-align: center" >RIF Resistant</th>
+				            <th style="text-align: center" >Errors</th>
+				            <th style="text-align: center" >View County Analytics </th>
 				            
 				         </tr>
 					</thead>
@@ -150,10 +163,15 @@ $(document).ready(function() {
 				
 				<td style="text-align: center"> <?php echo $row_rssample['ID']; ?></td>
 				<td style="text-align: center"> <?php echo $row_rssample['name']; ?> County</td>
+				<td style="text-align: center"> <?php echo $row_rssample['Totaltest']; ?></td>
+				<td style="text-align: center"> <?php echo $row_rssample['mtbpos']; ?> </td>
+				<td style="text-align: center"> <?php echo $row_rssample['MTBNEG']; ?></td>
+				<td style="text-align: center"> <?php echo $row_rssample['mtbrif']; ?> </td>
+				<td style="text-align: center"> <?php echo $row_rssample['err']; ?></td>
 				<td style="text-align: center"><a href="countyview.php?id=<?php echo $row_rssample['ID']; ?>"><img src="../img/icons/view.png" height="20" alt="View Details" title="View Details"/></a> 	
 				</td> 
 				 </tr>
-				      <?php } while ($row_rssample = mysql_fetch_assoc($rssample)); ?> 
+				      <?php } while ($row_rssample = mysqli_fetch_assoc($rssample)); ?> 
 				      
 				       <?php  ?>  
 						
@@ -165,7 +183,7 @@ $(document).ready(function() {
 	
 </div>
 <!-- Footer -->
-<footer class="main" style="margin-left: 5%">
+<footer class="main" style="margin-left: %">
 	
 		<div class="pull-right">
 		<?php

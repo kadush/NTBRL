@@ -2,57 +2,25 @@
 //include("head.php");
 
 @require_once('../connection/db.php'); 
-mysql_select_db($database, $ntrl);
-$sql= "SELECT countys.ID as a,countys.name as b,consumption.date as c, sum(consumption.allocated) as d
- FROM `consumption` ,facilitys, `districts` ,`countys`
-WHERE 
-`consumption`.`facility`= `facilitys`.`facilitycode`
-AND  `districts`.`ID` = `facilitys`.`district`
-AND consumption.status=1
-AND `countys`.`ID` = `districts`.`county`
-Group by  countys.ID";
-$rssample = mysql_query($sql, $ntrl) or die(mysql_error());
-$row_rssample = mysql_fetch_assoc($rssample);
 
-function TOTALFacilitypercounty($county){
-		
-$sql="SELECT 
-`facilitys`.`facilitycode` AS CODE,
-`facilitys`.`name` AS FACILITY, 
-`districts`.`name` AS DISTRICT,
-`countys`.`name` AS COUNTY
-FROM `facilitys` , `districts` ,`countys`
+$sql= "SELECT c.id as a,c.county as b,c.date as c, sum(c.allocated) as d
+ FROM `consumption_view` c
 WHERE 
-`districts`.`ID` = `facilitys`.`district`
-AND `countys`.`ID` = `districts`.`county`
-AND `countys`.`ID` = '$county'";
-$q=mysql_query($sql) or die();
-$rw=mysql_num_rows($q);
-return $rw;
-	
-}
+ c.status=1
+ Group by c.county";
+$rssample = mysqli_query($dbConn,$sql) or die(mysqli_error($dbConn));
+$row_rssample = mysqli_fetch_assoc($rssample);
+$num=mysqli_num_rows($rssample);
+
 function TOTALFacilityAllocatedpercounty($county){
-$sql= "SELECT 
-`consumption`.`facility` AS a,
-`facilitys`.`name` AS b, 
-`districts`.`name` AS c,
-consumption.commodity AS d,
-consumption.quantity AS e,
-consumption.quantity_used AS f,
-consumption.end_bal AS g,
-consumption.q_req AS h,
-`countys`.`name` as county
-FROM `consumption` ,facilitys, `districts` ,`countys`
-WHERE 
-`consumption`.`facility`= `facilitys`.`facilitycode`
-AND  `districts`.`ID` = `facilitys`.`district`
-AND `countys`.`ID` = `districts`.`county`
-AND consumption.status=1
-AND `countys`.`ID` = '$county'";
-$q=mysql_query($sql) or die();
-$rw=mysql_num_rows($q);
-return $rw;
-}
+    $sql= "SELECT c.mfl
+    FROM `consumption_view` c
+    WHERE c.status='1'
+    AND c.county = '$county'";
+    $q=mysqli_query($dbConn,$sql) or die();
+    $rw=mysqli_num_rows($q);
+    return $rw;
+    }
 ?>
 
 
@@ -156,9 +124,15 @@ $(document).ready(function() {
 							</thead>
 							<tbody>
 								
-									 <?php do {
-									 	   $TT=TOTALFacilityAllocatedpercounty($row_rssample['a']);
-									       $TT1=TOTALFacilitypercounty($row_rssample['a']);
+                                     <?php
+                                     if ($num=='0') {
+                                         # code...
+                                     } else {
+                                         # code...
+                                                                         
+                                     do {
+									 	   $TT=TOTALFacilityAllocatedpercounty($row_rssample['b']);
+									       $TT1=getAllGeneSitesInCountyX($row_rssample['b']);
 									       $row_rssample['c']= @date('Y', strtotime($row_rssample['c']));
 									 ?>      
 						<tr class="odd gradeX">
@@ -170,7 +144,7 @@ $(document).ready(function() {
 						<td style="text-align: center"> <?php echo $TT.' / '.$TT1; ?> </td>
 						<td style="text-align: center"> <?php echo $row_rssample['d']; ?> </td> 
 						 </tr>
-						      <?php } while ($row_rssample = mysql_fetch_assoc($rssample)); ?> 
+						      <?php } while ($row_rssample = mysqli_fetch_assoc($rssample)); }?> 
 						      
 						       <?php  ?>  
 								

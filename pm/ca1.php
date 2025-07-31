@@ -1,8 +1,5 @@
 <?php
-require_once('../connection/db.php'); 
-$sql= "SELECT Distinct county as a from facility_map ORDER BY county ASC";
-$rssample = mysqli_query($dbConn,$sql) or die(mysqli_error($dbConn));
-$row_rssample = mysqli_fetch_assoc($rssample);
+@require_once('../connection/db.php'); 
 
 ?>
 <!doctype html>
@@ -19,45 +16,28 @@ $row_rssample = mysqli_fetch_assoc($rssample);
 	</head>
 <body>
 
-	<div class="col-sm-3">
-
-		<div class="panel panel-gradient">
-			<div class="panel-heading">
-				<div class="panel-title">
-					<h4>
-						County Reporting
-					</h4>
-				</div>
 				
-				<div class="panel-options">
-					<a href="#" data-rel="collapse"><i class="entypo-down-open"></i></a>
-<a href="#" data-rel="close"><i class="entypo-cancel"></i></a>
-				</div>
-			</div>
+				 <div class="col-md-4 col-md-offset-5">
+				 	<form id="customForm"  method="GET" action="">
+				 		<table>
+				 			<tr>
+				 				<td>
+				 					<select name="id" class="form-control" >
+						  			<option value="">Select One County</option>
+								    <?php do{ $TT=TOTALFacilityReportedpercounty($row_rssample['a']); $TT1=getAllGeneSitesInCountyX($row_rssample['a']); 	?>
+								    <option value="<?php echo $row_rssample['a']; ?>"> <?php echo $row_rssample['a']; ?> County <span class="badge badge-info badge-roundless" style="float: right" ><?php echo $TT.' / '.$TT1; ?></span></option>
+									<?php } while ($row_rssample = mysqli_fetch_assoc($rssample));?>
+								    </select>
+								 </td>
+								 <td> 
+								    <input type="submit"  value="Filter" class="btn btn-green"/>
+				 				</td>
+				 			</tr>
+				 		</table>
+				 	
+					 </form>
+				  </div>
 		
-			<div class="panel-body no-padding">
-				<table class="table table-striped">
-							<thead>
-							<tr >
-								<td style="font-weight: bold;"> Counties</td>
-								<td style="font-weight: bold;">Reported / Total(GX Sites)</td>
-							</tr>
-						</thead>
-				         <tbody>
-					
-						 <?php do {  ?>      
-			            <tr class="odd gradeX">
-			            	<td> <a href="countyallocation.php?id=<?php echo $row_rssample['a']; ?>"><?php echo $row_rssample['a']; ?></a></td>
-			                <td style="text-align: center"> <?php echo TOTALFacilityReportedpercounty($row_rssample['a']).' / '.getAllGeneSitesInCountyX($row_rssample['a']); ?></td>
-			            </tr>
-					      <?php } while ($row_rssample = mysqli_fetch_assoc($rssample)); ?> 
-					   
-					    </tbody>
-						</table>
-			</div>
-		</div>
-
-	</div>
 
 			
 

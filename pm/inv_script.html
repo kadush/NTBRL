@@ -1,0 +1,169 @@
+SELECT
+g.facility AS facility,
+g.fname AS fname,
+g.sub_county AS sub_county,
+g.county AS county,
+g.m_3 AS m_3,
+g.m_2 AS m_2,
+g.m_1 AS m_1,
+g.m_0 AS m_0,
+COALESCE(cs.cartridge_total, 0) AS rem_c,
+CASE
+WHEN cs.cartridge_total IS NOT NULL THEN
+CASE
+WHEN (COALESCE(cs.cartridge_total, 0) - COALESCE(g.m_0, 0)) < 0 THEN 0 ELSE (COALESCE(cs.cartridge_total,
+    0) - COALESCE(g.m_0, 0)) END ELSE 0 END AS rt_rem_c, COALESCE(cs.falcon_tubes_total, 0) AS rem_f,
+    CASE WHEN cs.falcon_tubes_total IS NOT NULL THEN CASE WHEN (COALESCE(cs.falcon_tubes_total, 0) -
+    COALESCE(g.m_0, 0)) < 0 THEN 0 ELSE (COALESCE(cs.falcon_tubes_total, 0) -
+    COALESCE(g.m_0, 0)) END ELSE 0 END AS rt_rem_f FROM db_NTBRL.gx_wll3m g LEFT JOIN
+    db_NTBRL.commodity_summary cs ON g.facility=cs.mfl GROUP BY g.facility; select `db_NTBRL`.`g`.`facility` AS
+    `facility`,
+    `db_NTBRL`.`g`.`fname` AS `fname`,
+    `db_NTBRL`.`g`.`sub_county` AS `sub_county`,
+    `db_NTBRL`.`g`.`county` AS
+    `county`,
+    `db_NTBRL`.`g`.`m_3` AS `m_3`,
+    `db_NTBRL`.`g`.`m_2` AS
+    `m_2`,
+    `db_NTBRL`.`g`.`m_1` AS `m_1`,
+    `db_NTBRL`.`g`.`m_0`
+    AS `m_0`,(case when (`db_NTBRL`.`cs`.`cartridge_total` is not null) then (case when
+    (coalesce(`db_NTBRL`.`cs`.`cartridge_total`,0)) AS rem_c,(case when (`db_NTBRL`.`cs`.`cartridge_total` is not null)
+    then (case when ((coalesce(`db_NTBRL`.`cs`.`cartridge_total`,0) - coalesce(`db_NTBRL`.`g`.`m_0`,0)) <
+    0) then 0 else (coalesce(`db_NTBRL`.`cs`.`cartridge_total`,0) - coalesce(`db_NTBRL`.`g`.`m_0`,0))
+    end) else 0 end) AS `modified_cartridge_total`,(case when (`db_NTBRL`.`cs`.`falcon_tubes_total` is not null) then
+    (case when (coalesce(`db_NTBRL`.`cs`.`falcon_tubes_total`,0)) < 0) as rem_f, (case when
+    (`db_NTBRL`.`cs`.`falcon_tubes_total` is not null) then (case when
+    ((coalesce(`db_NTBRL`.`cs`.`falcon_tubes_total`,0) - coalesce(`db_NTBRL`.`g`.`m_0`,0)) < 0) then 0
+    else (coalesce(`db_NTBRL`.`cs`.`falcon_tubes_total`,0) - coalesce(`db_NTBRL`.`g`.`m_0`,0)) end) else
+    0 end) AS `modified_falcon_tubes_total` from (`db_NTBRL`.`gx_wll3m` `g` left join `db_NTBRL`.`commodity_summary`
+    `cs` on((`db_NTBRL`.`g`.`facility`=`db_NTBRL`.`cs`.`mfl`))) group by `db_NTBRL`.`g`.`facility`
+    
+    
+    
+    
+    CREATE VIEW `commodity_summary_tn` AS 
+SELECT
+    `t`.`mfl` AS `mfl`,
+    `t`.`facility` AS `facility`,
+
+    -- Calculate total for Cartridge
+    (CASE 
+        WHEN (MAX(CASE 
+                    WHEN (`t`.`commodity` = 'Cartridge') THEN 
+                        (((`t`.`end_bal` + COALESCE(`t`.`received`, 0)) + COALESCE(`sa`.`pos_cart`, 0)) - COALESCE(`sa`.`neg_cart`, 0)) 
+                    ELSE NULL 
+                 END) < 0) 
+        THEN 0 
+        ELSE MAX(CASE 
+                    WHEN (`t`.`commodity` = 'Cartridge') THEN 
+                        (((`t`.`end_bal` + COALESCE(`t`.`received`, 0)) + COALESCE(`sa`.`pos_cart`, 0)) - COALESCE(`sa`.`neg_cart`, 0)) 
+                    ELSE NULL 
+                 END) 
+    END) AS `cartridge_total`,
+
+    -- Calculate total for MTB Plus CHIPS
+    (CASE 
+        WHEN (MAX(CASE 
+                    WHEN (`t`.`commodity` = 'MTB Plus CHIPS') THEN 
+                        (((`t`.`end_bal` + COALESCE(`t`.`received`, 0)) + COALESCE(`sa`.`pos_mpc`, 0)) - COALESCE(`sa`.`neg_mpc`, 0)) 
+                    ELSE NULL 
+                 END) < 0) 
+        THEN 0 
+        ELSE MAX(CASE 
+                    WHEN (`t`.`commodity` = 'MTB Plus CHIPS') THEN 
+                        (((`t`.`end_bal` + COALESCE(`t`.`received`, 0)) + COALESCE(`sa`.`pos_mpc`, 0)) - COALESCE(`sa`.`neg_mpc`, 0)) 
+                    ELSE NULL 
+                 END) 
+    END) AS `MTPC_total`,
+
+    -- Calculate total for MTB RIF CHIPS
+    (CASE 
+        WHEN (MAX(CASE 
+                    WHEN (`t`.`commodity` = 'MTB RIF CHIPS') THEN 
+                        (((`t`.`end_bal` + COALESCE(`t`.`received`, 0)) + COALESCE(`sa`.`pos_mrc`, 0)) - COALESCE(`sa`.`neg_mrc`, 0)) 
+                    ELSE NULL 
+                 END) < 0) 
+        THEN 0 
+        ELSE MAX(CASE 
+                    WHEN (`t`.`commodity` = 'MTB RIF CHIPS') THEN 
+                        (((`t`.`end_bal` + COALESCE(`t`.`received`, 0)) + COALESCE(`sa`.`pos_mrc`, 0)) - COALESCE(`sa`.`neg_mrc`, 0)) 
+                    ELSE NULL 
+                 END) 
+    END) AS `MTRC_total`
+    
+FROM 
+    `db_NTBRL`.`consumption_view_tn` `t` 
+    LEFT JOIN (
+        SELECT 
+            `facility`,
+
+            SUM(CASE WHEN `adjustment` = 1 THEN `c_quantity` ELSE 0 END) AS `pos_cart`,
+            SUM(CASE WHEN `adjustment` = 0 THEN `c_quantity` ELSE 0 END) AS `neg_cart`,
+
+            SUM(CASE WHEN `adjustment` = 1 THEN `mpc_quantity` ELSE 0 END) AS `pos_mpc`,
+            SUM(CASE WHEN `adjustment` = 0 THEN `mpc_quantity` ELSE 0 END) AS `neg_mpc`,
+
+            SUM(CASE WHEN `adjustment` = 1 THEN `mrc_quantity` ELSE 0 END) AS `pos_mrc`,
+            SUM(CASE WHEN `adjustment` = 0 THEN `mrc_quantity` ELSE 0 END) AS `neg_mrc`
+
+        FROM `db_NTBRL`.`stock_adjustment_tn`
+        WHERE 
+            MONTH(`date`) = MONTH(CURDATE()) AND 
+            YEAR(`date`) = YEAR(CURDATE())
+        GROUP BY `facility`
+    ) `sa` ON `t`.`facility` = `sa`.`facility`
+GROUP BY 
+    `t`.`mfl`, 
+    `t`.`facility`;
+
+    select `db_NTBRL`.`sampletn`.`facility` AS `facility`,
+    `db_NTBRL`.`sampletn`.`fname` AS `fname`,
+    `db_NTBRL`.`sampletn`.`sub_county` AS `sub_county`,
+    `db_NTBRL`.`sampletn`.`county` AS `county`,
+    count((case when ((month(`db_NTBRL`.`sampletn`.`End_Time`) = month((curdate() - interval 3 month))) and (year(`db_NTBRL`.`sampletn`.`End_Time`) = year((curdate() - interval 3 month)))) then 1 else NULL end)) AS `m_3`,
+    count((case when ((month(`db_NTBRL`.`sampletn`.`End_Time`) = month((curdate() - interval 2 month))) and (year(`db_NTBRL`.`sampletn`.`End_Time`) = year((curdate() - interval 2 month)))) then 1 else NULL end)) AS `m_2`,
+    count((case when ((month(`db_NTBRL`.`sampletn`.`End_Time`) = month((curdate() - interval 1 month))) and (year(`db_NTBRL`.`sampletn`.`End_Time`) = year((curdate() - interval 1 month)))) then 1 else NULL end)) AS `m_1`,
+    count((case when ((month(`db_NTBRL`.`sampletn`.`End_Time`) = month(curdate())) and (year(`db_NTBRL`.`sampletn`.`End_Time`) = year(curdate()))) then 1 else NULL end)) AS `m_0`,
+    count((case when ((month(`db_NTBRL`.`sampletn`.`End_Time`) = month(curdate())) and (year(`db_NTBRL`.`sampletn`.`End_Time`) = year(curdate()))) and testName="MTB PLUS" then 1 else NULL end)) AS `mp_0`,
+    count((case when ((month(`db_NTBRL`.`sampletn`.`End_Time`) = month(curdate())) and (year(`db_NTBRL`.`sampletn`.`End_Time`) = year(curdate()))) and testName="MTB RIF" then 1 else NULL end)) AS `mr_0` 
+    from `db_NTBRL`.`sampletn` where ((`db_NTBRL`.`sampletn`.`End_Time` >= ((curdate() - interval (dayofmonth(curdate()) - 1) day) - interval 3 month)) and 
+    (`db_NTBRL`.`sampletn`.`End_Time` < ((curdate() - interval (dayofmonth(curdate()) - 1) day) + interval 1 month))) 
+    group by `db_NTBRL`.`sampletn`.`facility`,
+    `db_NTBRL`.`sampletn`.`fname`,
+    `db_NTBRL`.`sampletn`.`sub_county`,
+    `db_NTBRL`.`sampletn`.`county`
+
+
+    select `db_NTBRL`.`g`.`facility` AS `facility`,
+    `db_NTBRL`.`g`.`fname` AS `fname`,
+    `db_NTBRL`.`g`.`sub_county` AS `sub_county`,
+    `db_NTBRL`.`g`.`county` AS `county`,
+    `db_NTBRL`.`g`.`m_3` AS `m_3`,
+    `db_NTBRL`.`g`.`m_2` AS `m_2`,
+    `db_NTBRL`.`g`.`m_1` AS `m_1`,
+    `db_NTBRL`.`g`.`m_0` AS `m_0`,
+    coalesce(`db_NTBRL`.`cs`.`cartridge_total`,0) AS `rem_c`,
+    (case when (`db_NTBRL`.`cs`.`cartridge_total` is not null) then (case when ((coalesce(`db_NTBRL`.`cs`.`cartridge_total`,0) - coalesce(`db_NTBRL`.`g`.`m_0`,0)) < 0) then 0 else (coalesce(`db_NTBRL`.`cs`.`cartridge_total`,0) - coalesce(`db_NTBRL`.`g`.`m_0`,0)) end) else 0 end) AS `rt_rem_c`,
+
+    coalesce(`db_NTBRL`.`cs`.`MTPC_total`,0) AS `rem_mp`,
+    (case when (`db_NTBRL`.`cs`.`MTPC_total` is not null) then (case when ((coalesce(`db_NTBRL`.`cs`.`MTPC_total`,0) - coalesce(`db_NTBRL`.`g`.`mp_0`,0)) < 0) then 0 else (coalesce(`db_NTBRL`.`cs`.`MTPC_total`,0) - coalesce(`db_NTBRL`.`g`.`mp_0`,0)) end) else 0 end) AS `rt_rem_mpc`,
+	coalesce(`db_NTBRL`.`cs`.`MTRC_total`,0) AS `rem_mr`,
+    (case when (`db_NTBRL`.`cs`.`MTRC_total` is not null) then (case when ((coalesce(`db_NTBRL`.`cs`.`MTRC_total`,0) - coalesce(`db_NTBRL`.`g`.`mr_0`,0)) < 0) then 0 else (coalesce(`db_NTBRL`.`cs`.`MTRC_total`,0) - coalesce(`db_NTBRL`.`g`.`mr_0`,0)) end) else 0 end) AS `rt_rem_mpc` 
+    from (`db_NTBRL`.`tn_wll3m` `g` left join `db_NTBRL`.`commodity_summary_tn` `cs` on((`db_NTBRL`.`g`.`facility` = `db_NTBRL`.`cs`.`mfl`))) group by `db_NTBRL`.`g`.`facility`
+
+
+    select `db_NTBRL`.`sampletn`.`facility` AS `facility`,
+`db_NTBRL`.`sampletn`.`fname` AS `fname`,
+`db_NTBRL`.`sampletn`.`sub_county` AS `sub_county`,
+`db_NTBRL`.`sampletn`.`county` AS `county`,
+count((case when ((month(`db_NTBRL`.`sampletn`.`End_Time`) = month((curdate() - interval 3 month))) and (year(`db_NTBRL`.`sampletn`.`End_Time`) = year((curdate() - interval 3 month)))) then 1 else NULL end)) AS `m_3`,
+count((case when ((month(`db_NTBRL`.`sampletn`.`End_Time`) = month((curdate() - interval 2 month))) and (year(`db_NTBRL`.`sampletn`.`End_Time`) = year((curdate() - interval 2 month)))) then 1 else NULL end)) AS `m_2`,
+count((case when ((month(`db_NTBRL`.`sampletn`.`End_Time`) = month((curdate() - interval 1 month))) and (year(`db_NTBRL`.`sampletn`.`End_Time`) = year((curdate() - interval 1 month)))) then 1 else NULL end)) AS `m_1`,
+count((case when ((month(`db_NTBRL`.`sampletn`.`End_Time`) = month(curdate())) and (year(`db_NTBRL`.`sampletn`.`End_Time`) = year(curdate()))) then 1 else NULL end)) AS `m_0`,
+count((case when ((month(`db_NTBRL`.`sampletn`.`End_Time`) = month(curdate())) and (year(`db_NTBRL`.`sampletn`.`End_Time`) = year(curdate())) and (`db_NTBRL`.`sampletn`.`TestName` = 'MTB PLUS')) then 1 else NULL end)) AS `mp_0`,
+count((case when ((month(`db_NTBRL`.`sampletn`.`End_Time`) = month(curdate())) and (year(`db_NTBRL`.`sampletn`.`End_Time`) = year(curdate())) and (`db_NTBRL`.`sampletn`.`TestName` = 'MTB RIF')) then 1 else NULL end)) AS `mr_0` 
+from `db_NTBRL`.`sampletn` where ((`db_NTBRL`.`sampletn`.`End_Time` >= ((curdate() - interval (dayofmonth(curdate()) - 1) day) - interval 3 month)) and (`db_NTBRL`.`sampletn`.`End_Time` < ((curdate() - interval (dayofmonth(curdate()) - 1) day) + interval 1 month))) group by `db_NTBRL`.`sampletn`.`facility`,
+`db_NTBRL`.`sampletn`.`fname`,
+`db_NTBRL`.`sampletn`.`sub_county`,
+`db_NTBRL`.`sampletn`.`county`

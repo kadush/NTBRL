@@ -10,8 +10,8 @@ GROUP BY `section4`.`facility`
 
 ";
 
-$query=mysql_query($sql);
-$numrows=@mysql_num_rows($query);
+$query=mysqli_query($dbConn,$sql);
+$numrows=@mysqli_num_rows($query);
 
 if(!$numrows){
 
@@ -20,7 +20,7 @@ $dyn_table3 .= '<td colspan="4" align="center"> No Data to Display </td></tr>';
 else{
 $i=0;
 $dyn_table3 = '<table cellpadding="0" cellspacing="0" border="0" class="display" id="example" width="100%">';	
-while($row=mysql_fetch_assoc($query)){
+while($row=mysqli_fetch_assoc($query)){
 	
 $mfl=$row['MFL'];
 $facility=$row['FACILITY'];	

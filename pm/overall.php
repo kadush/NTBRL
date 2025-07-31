@@ -1,11 +1,128 @@
 <?php
-include('header1.php');
+include('header.php');
 
-@require_once('../connection/db.php'); 
-$conn = mysql_connect($hostname, $username, $password);
-$sql="SELECT total,mtb,neg,rif,errs
+//used in filters  
+
+$mwaka = $_GET['year'];
+$mwezi = $_GET['mwezi'];
+
+if (isset($_GET['filter'])) {
+	$filter = $_GET['filter'];
+	if ($filter == 1)//LAST 3 MONTHS
+	{
+		$todate = @date("Y-m-d");
+		// current date
+		$fromdate = @date('Y-m-d', strtotime('-3 month'));
+		$displayfromdate = @date("d-M-Y", strtotime($fromdate));
+		$displaytodate = @date("d-M-Y", strtotime($todate));
+		$title = "Last 3 Months";
+		$currentmonth = @date("m");
+		$currentyear = @date("Y");
+		$colspan = 3;
+		$mapwidth = 540;
+
+	} elseif ($filter == 7)//last 6 months
+	{
+		$todate = @date("Y-m-d");
+		// current date
+		$fromdate = @date('Y-m-d', strtotime('-6 month'));
+		$displayfromdate = @date("d-M-Y", strtotime($fromdate));
+		$displaytodate = @date("d-M-Y", strtotime($todate));
+		$title = "Last 6 Months";
+		$currentmonth = @date("m");
+		$currentyear = @date("Y");
+		$colspan = 6;
+		$mapwidth = 540;
+	} elseif ($filter == 0)//last submission
+	{
+		$filter = 0;
+		$colspan = 6;
+		$mapwidth = 540;
+		$currentmonth = GetMaxMonthbasedonMaxYear($mwezi);
+		$displaymonth = GetMonthName($currentmonth);
+		$currentyear = GetMaxYear($mwaka);
+		$title = "Last Upload :" . $displaymonth . ' - ' . $currentyear;
+		//get current month and year
+	} elseif ($filter == 3)//month/year
+	{
+		$displaymonth =GetMonthName($mwezi);
+		$title = $displaymonth . ' - ' . $mwaka;
+		//get current month and year
+		$currentmonth = $mwezi;
+		$currentyear = $mwaka;
+		$colspan = 1;
+		$mapwidth = 540;
+	} elseif ($filter == 4)//year
+	{
+		$title = $mwaka;
+		//get current month and year
+		$currentmonth = "";
+		//get current month and year
+		$currentyear = $mwaka;
+		$colspan = 12;
+		$mapwidth = 400;
+	}
+	elseif ($filter == 8)//all
+	{
+		$currentmonth = GetMaxMonthbasedonMaxYear($mwezi);
+		$currentyear = GetMaxYear($mwaka);
+		$displaymonth = GetMonthName($currentmonth);
+		$minyear = GetMinYear();
+		$title = "Cumulative Data : " . $minyear . ' to ' . $displaymonth . ' - ' . $currentyear;
+		
+	}
+} else {
+	if ($_REQUEST['submitform']) {
+		$filter = 2;
+		$fromfilter = $_GET['fromfilter'];
+		$tofilter = $_GET['tofilter'];
+		$displayfromfilter = @date("d-M-Y", strtotime($fromfilter));
+		$displaytofilter = @date("d-M-Y", strtotime($tofilter));
+		$title = $displayfromfilter . "  to  " . $displaytofilter;
+		$currentmonth = @date("m");
+		$currentyear = @date("Y");
+		$colspan = 1;
+		$mapwidth = 540;
+	} else {
+		if (isset($mwaka)) {
+			if (isset($mwezi)) {
+				$filter = 3;
+				$displaymonth = GetMonthName($mwezi);
+				$title = $displaymonth . ' - ' . $mwaka;
+				//get current month and year
+				$currentmonth = $mwezi;
+				$currentyear = $mwaka;
+				$colspan = 1;
+				$mapwidth = 540;
+			} else {
+				$filter = 4;
+				$title = $mwaka;
+				//get current month and year
+				$currentmonth = "";
+				//get current month and year
+				$currentyear = $mwaka;
+				$colspan = 12;
+				$mapwidth = 400;
+			}
+		} else  {	
+		    $filter = 0;
+			$colspan = 6;
+			$mapwidth = 540;
+
+			$currentmonth = GetMaxMonthbasedonMaxYear();
+			$displaymonth = GetMonthName($currentmonth);
+			$currentyear = GetMaxYear($samp);
+			$title = "Last Upload :" . $displaymonth . ' - ' . $currentyear;
+			//get current month and year
+		}
+	}
+}
+
+$sql="SELECT fac, total,mtb,neg,rif,ind,errs
 FROM(
 SELECT 
+
+COUNT(DISTINCT facility) AS fac,
 
 sum(CASE WHEN cond='1' THEN 1 ELSE 0 END) as total,
 
@@ -13,20 +130,29 @@ sum( CASE WHEN Test_Result = 'positive' THEN 1 ELSE 0 END ) AS mtb,
 
 sum( CASE WHEN Test_Result =  'negative'  THEN 1 ELSE 0 END) as neg,
 
-sum( CASE WHEN mtbRif = 'positive' THEN 1 ELSE 0 END ) AS rif,  
+sum( CASE WHEN mtbRif = 'positive' THEN 1 ELSE 0 END ) AS rif,
 
-sum( CASE WHEN Test_Result = 'ERROR' OR Test_Result = 'Invalid' OR Test_Result = 'Indeterminate' THEN 1 ELSE 0 END ) AS errs  
-FROM sample1 where cond=1)x" ;	
-$query=mysql_query($sql,$conn ) or die(mysql_error());
-$rs=mysql_fetch_assoc($query);
+sum( CASE WHEN mtbRif = 'Indeterminate' THEN 1 ELSE 0 END ) AS ind,  
 
+sum( CASE WHEN Test_Result = 'ERROR' OR Test_Result = 'Invalid' THEN 1 ELSE 0 END ) AS errs  
+FROM sample1 where cond=1 and facility<99999
+)x" ;	
+$query=mysqli_query($dbConn,$sql,$ntrl ) or die(mysqli_error($dbConn));
+$rs=mysqli_fetch_assoc($query);
+$totalfac=$rs['fac'];
 $total=$rs['total'];
 $mtb=$rs['mtb'];
 $notb=$rs['neg'];
 $rif=$rs['rif'];
+$ind=$rs['ind'];
 $errs=$rs['errs'];
 
-/* ****************************************************/
+$sql1= "Select distinct s.Error_Code as code,count(*) as total
+FROM sample1 s  WHERE (Test_Result='Error') and Error_Code!='' and MONTH(End_Time)='$currentmonth' AND YEAR(End_Time)='$currentyear' group by s.Error_Code ORDER BY total";
+$rs1 = mysqli_query($dbConn,$sql1) or die(mysqli_error($dbConn));
+$rows1 = mysqli_fetch_array($rs1);
+
+/*****************************************************/
 $tnat=totalTestsNational($filter, $currentmonth, $currentyear, $fromfilter, $tofilter, $fromdate, $todate);
 $tt=totalTestsByOutcome($filter, $currentmonth, $currentyear, $fromfilter, $tofilter, $fromdate, $todate);
 $age=totalTestsByAge($filter, $currentmonth, $currentyear, $fromfilter, $tofilter, $fromdate, $todate);
@@ -36,11 +162,19 @@ $ptype=totalTestsByPtype($filter, $currentmonth, $currentyear, $fromfilter, $tof
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<script language="JavaScript" src="../FusionMaps/JSClass/FusionMaps.js"></script>
-<script language="JavaScript" src="../FusionCharts/JSClass/FusionCharts.js"></script>
+	
+<link rel="stylesheet" href="../admin/neon//neon-x/assets/js/jquery-ui/css/no-theme/jquery-ui-1.10.3.custom.min.css"  id="style-resource-1">
+	<link rel="stylesheet" href="../admin/neon//neon-x/assets/css/font-icons/entypo/css/entypo.css"  id="style-resource-2">
+	<link rel="stylesheet" href="../admin/neon//neon-x/assets/css/font-icons/entypo/css/animation.css"  id="style-resource-3">
+	<link rel="stylesheet" href="../admin/neon//neon-x/assets/css/neon.css"  id="style-resource-5">
+	<link rel="stylesheet" href="../admin/neon//neon-x/assets/css/custom.css"  id="style-resource-6">
+
+	<script src="../admin/neon//neon-x/assets/js/jquery-1.10.2.min.js"></script>
+    <!-- <script language="JavaScript" src="../FusionMaps/JSClass/FusionMaps.js"></script> -->
+    <script language="JavaScript" src="../FusionCharts/FusionCharts.js"></script>
 
 
-<div class="main-content" style="padding-left: 1.5%;padding-right: 1.5%;">   
+<div class="main-content" style="padding-left: 0.25%;padding-right: 0.25%;">   
 <div class="row" >
 	<ol class="breadcrumb" class="navbar-fixed-top">
 		<form id="customForm"  method="GET" action="" >
@@ -139,13 +273,7 @@ elseif (($filter==4) || ($filter==3)) //month/year filter
 			</div>
 		
 			<div class="panel-body no-padding">
-				<div id="mapdiv"> 
-				    <script type="text/javascript">
-					   var map = new FusionMaps("../FusionMaps/FCMap_KenyaCounty.swf", "mapdiv", "525", "375", "0", "0");
-					   map.setDataURL("../xml1/countymap.php");		   
-					   map.render("mapdiv");
-					</script>
-				</div>
+				<?php include('map.php'); ?>
 			</div>
 		</div>
 
@@ -173,15 +301,15 @@ elseif (($filter==4) || ($filter==3)) //month/year filter
 					<?php if (($tt[0]==0) and ($tt[1]==0) and ($tt[2]==0)) { ?> 
 						
 					<script type="text/javascript">
-					var myChart = new FusionCharts("../FusionCharts/Charts/Pie2D.swf?ChartNoDataText=No data to display", "myChartnat", "300", "163", "0", "0");
+					var myChart = new FusionCharts("Pie2D", "myChartnat", "300", "195", "0");
 					myChart.setDataXML("<chart></chart>");
 		            myChart.render("chartnatw");
 				    </script>		
 						
 					<?php } else { ?> 
 			         <script type="text/javascript">
-			          var myChart = new FusionCharts("../FusionCharts/Charts/Pie2D.swf", "myChartnat", "300", "163", "0", "0");
-			          myChart.setDataXML('<chart bgcolor="#FFFFFF" showBorder="0" ><set  isSliced="1" label="MTB Pos" color="00ACE8" value="<?php echo $tt[1]; ?>"/><set  label="MTB Neg" color="C295F2" value="<?php echo $tt[2]; ?>"/><set  label="RIF Resistant" color="ADFF2F" value="<?php echo $tt[3];?>"/></chart>');  
+			          var myChart = new FusionCharts("Pie2D", "myChartnat", "300", "195", "0");
+			          myChart.setDataXML('<chart bgcolor="#FFFFFF" showBorder="0" ><set  isSliced="1" label="MTB Pos" color="00ACE8" value="<?php echo $tt[2]; ?>"/><set  label="MTB Neg" color="C295F2" value="<?php echo $tt[3]; ?>"/><set  label="RIF Resistant" color="ADFF2F" value="<?php echo $tt[4];?>"/><set  label="Errors" color="ff0000" value="<?php echo $tt[6]; ?>"/><set  label="RIF Indeterminate" color="AD662F" value="<?php echo $tt[5];?>"/></chart>');  
 			          myChart.render("chartnatw");
 			         </script> 
 				    <?php } ?>
@@ -213,20 +341,24 @@ elseif (($filter==4) || ($filter==3)) //month/year filter
 				<table class="table table-striped">
 					<thead>
 					<tr>
-					<td style="text-align:center">Total Tests</td>
-					<td style="text-align:center">MTB +ve</td>
-					<td style="text-align:center">MTB -ve</td>
-					<td style="text-align:center">RIF Resistant</td>
-					<td style="text-align:center">Errors</td>
+						<td style="text-align:center">Total Devices</td>
+						<td style="text-align:center">Total Tests</td>
+						<td style="text-align:center">MTB +ve</td>
+						<td style="text-align:center">MTB -ve</td>
+						<td style="text-align:center">RIF Resistant</td>
+						<td style="text-align:center">RIF Indeterminate</td>
+						<td style="text-align:center">Errors / Invalid</td>
 					</tr>
 					</thead>
 					<tbody>
 					<tr>
-					<td style="text-align:center"><?php echo $total ;?></td>
-					<td style="text-align:center"><?php echo $mtb ;?></td>
-					<td style="text-align:center"><?php echo $notb ;?></td>
-					<td style="text-align:center"><?php echo $rif ;?></td>
-					<td style="text-align:center"><?php echo $errs ;?></td>
+						<td style="text-align:center"><a data-toggle="modal" data-target="#myModal"> <?php echo $totalfac ;?> </a> </td>
+						<td style="text-align:center"><?php echo $total ;?></td>
+						<td style="text-align:center"><?php echo $mtb ;?></td>
+						<td style="text-align:center"><?php echo $notb ;?></td>
+						<td style="text-align:center"><?php echo $rif ;?></td>
+						<td style="text-align:center"><?php echo $ind ;?></td>
+						<td style="text-align:center"><?php echo $errs ;?></td>
 					</tr>
 					</tbody>
 				</table> <br>
@@ -234,26 +366,58 @@ elseif (($filter==4) || ($filter==3)) //month/year filter
 					<table class="table table-bordered">
 					<thead>
 					<tr>
-					<td style="text-align:center">Total Tests</td>
-					<td style="text-align:center">MTB +ve</td>
-					<td style="text-align:center">MTB -ve</td>
-					<td style="text-align:center">RIF Resistant</td>
-					<td style="text-align:center">Errors</td>
+						<td style="text-align:center">Total Devices</td>
+						<td style="text-align:center">Total Tests</td>
+						<td style="text-align:center">MTB +ve</td>
+						<td style="text-align:center">MTB -ve</td>
+						<td style="text-align:center">RIF Resistant</td>
+						<td style="text-align:center">RIF Indeterminate</td>
+						<td style="text-align:center">Errors / Invalid</td>
 					</tr>
 					</thead>
 					<tbody>
 					<tr>
-					<td style="text-align:center"><?php echo $tt[0] ;?></td>
-					<td style="text-align:center"><?php echo $tt[1]  ;?></td>
-					<td style="text-align:center"><?php echo $tt[2] ;?></td>
-					<td style="text-align:center"><?php echo $tt[3] ;?></td>
-					<td style="text-align:center"><?php echo $tt[4] ;?></td>
+						<td style="text-align:center"><?php echo $tt[0] ;?></td>
+						<td style="text-align:center"><?php echo $tt[1]  ;?></td>
+						<td style="text-align:center"><?php echo $tt[2] ;?></td>
+						<td style="text-align:center"><?php echo $tt[3] ;?></td>
+						<td style="text-align:center"><?php echo $tt[4] ;?></td>
+						<td style="text-align:center"><?php echo $tt[5] ;?></td>
+						<td style="text-align:center"> <a onclick ="javascript:ShowHide('errorview')" href="javascript:;" title=" Click to Filter View based on Date Range you Specify"><?php echo $tt[6] ;?> </a></font></small></td>
 					</tr>
 					</tbody>
 			   </table>
+			   <div id="errorview" style="DISPLAY: none" >
+				<?php $class=array("primary"=>"1","info"=>"2","danger"=>"3","success"=>"4","warning"=>"5"); 
+					do { ?>
+						<li class="list-group-item">
+							<span class="badge badge-<?php  echo array_rand($class,1); ?>"><?php echo $rows1[1]; ?></span>
+							<?php echo $rows1[0]; ?>
+						</li>
+					<?php } 
+					while ($rows1 = mysqli_fetch_array($rs1)); ?>			
+			 </div>
 			
 		</div>
-
+<div class="modal" id="myModal" tabindex="-1" role="dialog" style="z-index: 1050;float: right">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+      </div>
+      <div class="modal-body" id="result">
+        <script>
+			$( "#result" ).load( "err.php" );
+		</script>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
 	</div>
 	<div class="col-sm-3">
 
@@ -278,14 +442,14 @@ elseif (($filter==4) || ($filter==3)) //month/year filter
 					<?php if (($age[0]==0) and ($age[1]==0) and ($age[2]==0)) { ?>
 						
 					<script type="text/javascript">
-					var myChart = new FusionCharts("../FusionCharts/Charts/Doughnut2D.swf?ChartNoDataText=No data to display", "myChartnat", "300", "133", "0", "0");
+					var myChart = new FusionCharts("Doughnut2D", "myChartnat", "300", "133", "0");
 					myChart.setDataXML("<chart></chart>");
 		            myChart.render("chartnat1");
 				    </script>
 						
 					<?php } else { ?>
 						<script type="text/javascript">
-					    var myChart = new FusionCharts("../FusionCharts/Charts/Doughnut2D.swf", "myChartnat", "300", "133", "0", "0");
+					    var myChart = new FusionCharts("Doughnut2D", "myChartnat", "300", "133", "0");
 					    myChart.setDataXML('<chart  bgcolor="FFFFFF"   showborder="0"  palette="2" animation="1"  pieSliceDepth="30" startingAngle="125"><set value="<?php echo $age[0]; ?>" label="Above 15 Yrs" color="C295F2"/><set value="<?php echo $age[1]; ?>" label="Btwn 5-15 Yrs" color="#ADFF2F"/><set value="<?php echo $age[2]; ?>" label="Below 5 Yrs" color="00ACE8"/><styles><definition><style type="font" name="CaptionFont" size="11" color="666666" /><style type="font" name="SubCaptionFont" bold="0" /></definition><application><apply toObject="caption" styles="CaptionFont" /><apply toObject="SubCaption" styles="SubCaptionFont" /></application></styles></chart>');
 					    myChart.render("chartnat1");
 					    
@@ -320,7 +484,7 @@ elseif (($filter==4) || ($filter==3)) //month/year filter
 					<tr>
 					<td  style="text-align:center">#</td>
 					<td  style="text-align:center"><5 Yrs</td>
-					<td  style="text-align:center">Btwn 5-15 Yrs</td>
+					<td  style="text-align:center">Btwn 6-15 Yrs</td>
 					<td  style="text-align:center">>15 Yrs</td>
 					</tr>
 					</thead>
@@ -356,38 +520,57 @@ elseif (($filter==4) || ($filter==3)) //month/year filter
 <br />
 
 <div class="row">
-	
-	<div class="col-sm-5">
-
-		<div class="panel panel-gradient">
-			<div class="panel-heading">
-				<div class="panel-title">
-					<h4>
-						Testing Trends For: 
+	<div class="col-md-5">
+		<div id="accordion-test-2" class="panel-group">
+		<div class="panel panel-default">
+		<div class="panel-heading">
+		<h4 class="panel-title">
+		  <a href="#collapseOne" data-parent="#accordion-test-2" data-toggle="collapse"> Testing Trends For: 
 					<br />
 						<small><?php echo $currentyear; ?></small>
-					</h4>
-				</div>
-				
-				<div class="panel-options">
-					<a href="#" data-rel="collapse"><i class="entypo-down-open"></i></a>
-<a href="#" data-rel="close"><i class="entypo-cancel"></i></a>
-				</div>
-			</div>
-		
-			<div class="panel-body no-padding">
-				<div id="chartdivtre"> 
+					
+	      </a>
+		</h4>
+		</div>
+		<div id="collapseOne" class="panel-collapse collapse in">
+		<div class="panel-body">
+			<div id="chartdivtre2"> </div>
 				   <script type="text/javascript">
-				      var myChart = new FusionCharts("../FusionCharts/Charts/MSLine.swf", "myChartId", "520", "300", "0", "0");
-				    myChart.setDataURL("../xml1/nationaltrendline.php?mwaka=<?php echo $currentyear; ?>");
+					    var myChart = new FusionCharts("../FusionCharts/MSLine.swf", "myChartId10", "500", "250","0");
+					    myChart.setXMLUrl("../xml1/nationaltrendline.php?mwaka=<?php echo $currentyear; ?>");
+					    myChart.render("chartdivtre2");
+				   </script>
+			
+		</div>
+		</div>
+		</div>
+		<div class="panel panel-default">
+		<div class="panel-heading">
+		<h4 class="panel-title">
+		<a href="#collapseTwo" data-parent="#accordion-test-2" data-toggle="collapse"> Testing Trends For: 
+					<br />
+						<small><?php echo $minY = GetMinYear(); ?> - <?php echo $maxY = GetMaxYear(); ?></small>
+					
+	     </a>
+		</h4>
+		</div>
+		<div id="collapseTwo" class="panel-collapse collapse">
+		<div class="panel-body">
+			<div id="chartdivtre"> </div>
+				   <script type="text/javascript">
+				    var myChart = new FusionCharts("MSLine", "myChartId", "450", "200", "0");
+				    myChart.setXMLUrl("../xml1/allyears.php");
 				    myChart.render("chartdivtre");
 				    
-				   </script> 
-				</div>
-			</div>
+				   </script>  
+			
 		</div>
+		</div>
+		</div>
+		
+		</div>
+</div>
 
-	</div>
 	<div class="col-sm-3">
 
 		<div class="panel panel-gradient">
@@ -412,7 +595,7 @@ elseif (($filter==4) || ($filter==3)) //month/year filter
 					<?php if (($gender[0]==0) and ($gender[1]==0) and ($gender[2]==0)) { ?> 
 						
 					<script type="text/javascript">
-					var myChart = new FusionCharts("../FusionCharts/Charts/Pie3D.swf?ChartNoDataText=No data to display", "myChartnat", "300", "130", "0", "0");
+					var myChart = new FusionCharts("Pie3D", "myChartnat", "300", "130", "0");
 					myChart.setDataXML("<chart></chart>");
 		            myChart.render("chartnat2");
 				    </script>		
@@ -420,7 +603,7 @@ elseif (($filter==4) || ($filter==3)) //month/year filter
 					<?php } else { ?>
 					
          		<script type="text/javascript">
-			   var myChart = new FusionCharts("../FusionCharts/Charts/Pie3D.swf", "myChartnat", "300", "130", "0", "0");
+			   var myChart = new FusionCharts("Pie3D", "myChartnat", "300", "130", "0");
 			   myChart.setDataXML('<chart bgcolor="FFFFFF" showborder="0" palette="2" animation="1"  pieSliceDepth="30" startingAngle="125" ><set value="<?php echo $gender[0]; ?>" label="Male" color="C295F2"/><set value="<?php echo $gender[1]; ?>" label="Female" color="#ADFF2F"/><set value="<?php echo $gender[2]; ?>" label="Not specified" color="00ACE8"/><styles><definition><style type="font" name="CaptionFont" size="11" color="666666" /><style type="font" name="SubCaptionFont" bold="0" /></definition><application><apply toObject="caption" styles="CaptionFont" /><apply toObject="SubCaption" styles="SubCaptionFont" /></application></styles></chart>');
 			   myChart.render("chartnat2");
 			    
@@ -504,14 +687,14 @@ elseif (($filter==4) || ($filter==3)) //month/year filter
 				 <?php if (($hstatus[0]==0) and ($hstatus[1]==0) and ($hstatus[2]==0)) { ?> 
 						
 					<script type="text/javascript">
-					var myChart = new FusionCharts("../FusionCharts/Charts/Pie2D.swf?ChartNoDataText=No data to display", "myChartnat", "300", "140", "0", "0");
+					var myChart = new FusionCharts("Pie2D", "myChartnat", "300", "140", "0");
 					myChart.setDataXML("<chart></chart>");
 		            myChart.render("chartnat3");
 				    </script>		
 						
 					<?php } else { ?> 
         		<script type="text/javascript">
-      			var myChart = new FusionCharts("../FusionCharts/Charts/Pie2D.swf", "myChartnat", "300", "140", "0", "0");
+      			var myChart = new FusionCharts("Pie2D", "myChartnat", "300", "140", "0");
 			    myChart.setDataXML('<chart  bgcolor="FFFFFF"   showborder="0"  palette="2" animation="1"   pieSliceDepth="30" startingAngle="125"> <set value="<?php echo $hstatus[0]; ?>" label="Positive" color="C295F2"/><set value="<?php echo $hstatus[1]; ?>" label="Negative" color="#ADFF2F"/><set value="<?php echo $hstatus[2]; ?>" label="Not specified" color="00ACE8"/><styles><definition><style type="font" name="CaptionFont" size="11" color="666666" /><style type="font" name="SubCaptionFont" bold="0" /></definition><application><apply toObject="caption" styles="CaptionFont" /><apply toObject="SubCaption" styles="SubCaptionFont" /></application></styles></chart>');
 			    myChart.render("chartnat3"); 
 			    </script> 
@@ -581,7 +764,7 @@ elseif (($filter==4) || ($filter==3)) //month/year filter
 <br />
 <div class="row">
 	
-	<div class="col-sm-5">
+	<!-- <div class="col-sm-5">
 		
 		<div class="panel panel-gradient">
 			<div class="panel-heading">
@@ -601,17 +784,17 @@ elseif (($filter==4) || ($filter==3)) //month/year filter
 				
 			<div id="chartp"  align="center"> 
               <script type="text/javascript">
-		      var myChart = new FusionCharts("../FusionCharts/Charts/StackedColumn2D.swf", "myChartnat", "480", "300", "0", "0");
-		      myChart.setDataXML('<chart palette="2" yAxisName="# of Patients"  showLabels="1" showvalues="0"  numberPrefix="" showSum="0" decimals="0" useRoundEdges="1" legendBorderAlpha="0" bgcolor="FFFFFF" showborder="0"><categories><category label="sputum smear-positive relapse" /><category label="sputum smear-negative relapse" /><category label="Return after defaulting" /><category label="Failure 1-st line treatment" /><category label="Failure re-treatment" /><category label="New Patients" /><category label="New case PTB" /><category label="MDR TB Contact" /><category label="Refugees SS+ve" /><category label="HCWs" /><category label="Hiv(+) & Smear(-)" /></categories><dataset seriesName="MTB Pos" color="AFD8F8" showValues="0"><set value="<?php echo $ptype[0]; ?>" /><set value="<?php echo $ptype[2]; ?>" /><set value="<?php echo $ptype[4]; ?>" /><set value="<?php echo $ptype[6]; ?>" /><set value="<?php echo $ptype[8]; ?>" /><set value="<?php echo $ptype[10]; ?>" /><set value="<?php echo $ptype[12]; ?>" /><set value="<?php echo $ptype[14]; ?>" /><set value="<?php echo $ptype[16]; ?>" /><set value="<?php echo $ptype[18]; ?>" /><set value="<?php echo $ptype[20]; ?>" /></dataset><dataset seriesName="Rif Resistant" color="F6BD0F" showValues="0"><set value="<?php echo $ptype[1] ; ?>" /><set value="<?php echo $ptype[3] ; ?>" /><set value="<?php echo $ptype[5] ; ?>" /><set value="<?php echo $ptype[7] ; ?>" /><set value="<?php echo $ptype[9] ; ?>" /><set value="<?php echo $ptype[11] ; ?>" /><set value="<?php echo $ptype[13] ; ?>" /><set value="<?php echo $ptype[15] ; ?>" /><set value="<?php echo $ptype[17] ; ?>" /><set value="<?php echo $ptype[19] ; ?>" /><set value="<?php echo $ptype[21] ; ?>" /></dataset></chart>');
+		      var myChart = new FusionCharts("StackedColumn2D", "myChartnat", "480", "300", "0");
+		      myChart.setDataXML('<chart palette="2" yAxisName="# of Patients"  showLabels="1" showvalues="0"  numberPrefix="" showSum="0" decimals="0" useRoundEdges="1" legendBorderAlpha="0" bgcolor="FFFFFF" showborder="0"><categories><category label="smear positive at 2 months" /><category label="All smear negative PTB cases" /><category label="Return after defaulting" /><category label="Failure 1-st line treatment" /><category label="Failure re-treatment" /><category label="Extra pulmonary" /><category label="New presumptive PTB" /><category label="DR TB Contact" /><category label="Refugees SS+ve" /><category label="HCWs" /><category label="Hiv Symptomatic" /></categories><dataset seriesName="MTB Pos" color="AFD8F8" showValues="0"><set value="<?php echo $ptype[0]; ?>" /><set value="<?php echo $ptype[2]; ?>" /><set value="<?php echo $ptype[4]; ?>" /><set value="<?php echo $ptype[6]; ?>" /><set value="<?php echo $ptype[8]; ?>" /><set value="<?php echo $ptype[10]; ?>" /><set value="<?php echo $ptype[12]; ?>" /><set value="<?php echo $ptype[14]; ?>" /><set value="<?php echo $ptype[16]; ?>" /><set value="<?php echo $ptype[18]; ?>" /><set value="<?php echo $ptype[20]; ?>" /></dataset><dataset seriesName="Rif Resistant" color="F6BD0F" showValues="0"><set value="<?php echo $ptype[1] ; ?>" /><set value="<?php echo $ptype[3] ; ?>" /><set value="<?php echo $ptype[5] ; ?>" /><set value="<?php echo $ptype[7] ; ?>" /><set value="<?php echo $ptype[9] ; ?>" /><set value="<?php echo $ptype[11] ; ?>" /><set value="<?php echo $ptype[13] ; ?>" /><set value="<?php echo $ptype[15] ; ?>" /><set value="<?php echo $ptype[17] ; ?>" /><set value="<?php echo $ptype[19] ; ?>" /><set value="<?php echo $ptype[21] ; ?>" /></dataset></chart>');
 		      myChart.render("chartp");
 		      </script> 
 			  </div>
 
 		</div>
 		
-	</div>
+	</div> -->
 
-	<div class="col-sm-7">
+	<div class="col-sm-12">
 		
 		<div class="panel panel-gradient">
 			<div class="panel-heading">
@@ -633,17 +816,21 @@ elseif (($filter==4) || ($filter==3)) //month/year filter
 				<thead>
 					<tr>
 					<td  style="text-align:center">#</td>
-					<td style="text-align:center">sputum smear (+) relapse</td>
-					<td style="text-align:center">sputum smear (-) relapse</td>
+					<td style="text-align:center">Smear positive at 2 months</td>
+					<td style="text-align:center">All smear negative PTB cases</td>
 					<td style="text-align:center">Return after defaulting</td>
 					<td style="text-align:center">Failure 1st line treatment</td>
 					<td style="text-align:center">Failure re-treatment</td>
-					<td style="text-align:center">New Patients</td>
-					<td style="text-align:center">New case PTB</td>
-					<td style="text-align:center">MDR TB Contact</td>
+					<td style="text-align:center">Extra Pulmonary</td>
+					<td style="text-align:center">New presumptive PTB</td>
+					<td style="text-align:center">DR TB Contact</td>
 					<td style="text-align:center">Refugees SS+ve</td>
 					<td style="text-align:center">HCWs</td>
-					<td style="text-align:center">Hiv (+) & Smear (-)</td>
+					<td style="text-align:center">Hiv (+)ve with symptoms of TB</td>
+					<td style="text-align:center">Relapse</td>
+					<td style="text-align:center">Prisoners with TB symptoms</td>
+					<td style="text-align:center">Patients who develop TB while on IPT</td>
+					<td style="text-align:center">No Patient type</td>
 					</tr>
 					</thead>
 					<tbody>
@@ -660,6 +847,10 @@ elseif (($filter==4) || ($filter==3)) //month/year filter
 					<td style="text-align:center"><?php echo $tnat[51] ;?></td>
 					<td style="text-align:center"><?php echo $tnat[54] ;?></td>
 					<td style="text-align:center"><?php echo $tnat[57] ;?></td>
+					<td style="text-align:center"><?php echo $tnat[60] ;?></td>
+					<td style="text-align:center"><?php echo $tnat[63] ;?></td>
+					<td style="text-align:center"><?php echo $tnat[66] ;?></td>
+					<td style="text-align:center"><?php echo $tnat[69] ;?></td>
 					</tr>
 					<tr>
 					<td style="text-align:center">MTB +ve</td>
@@ -674,6 +865,10 @@ elseif (($filter==4) || ($filter==3)) //month/year filter
 					<td style="text-align:center"><?php echo $tnat[52] ;?></td>
 					<td style="text-align:center"><?php echo $tnat[55] ;?></td>
 					<td style="text-align:center"><?php echo $tnat[58] ;?></td>
+					<td style="text-align:center"><?php echo $tnat[61] ;?></td>
+					<td style="text-align:center"><?php echo $tnat[64] ;?></td>
+					<td style="text-align:center"><?php echo $tnat[67] ;?></td>
+					<td style="text-align:center"><?php echo $tnat[70] ;?></td>
 					</tr>
 					<tr>
 					<td style="text-align:center">Rif Resistant</td>
@@ -688,6 +883,10 @@ elseif (($filter==4) || ($filter==3)) //month/year filter
 					<td style="text-align:center"><?php echo $tnat[53] ; ?></td>
 					<td style="text-align:center"><?php echo $tnat[56] ; ?></td>
 					<td style="text-align:center"><?php echo $tnat[59] ; ?></td>
+					<td style="text-align:center"><?php echo $tnat[62] ; ?></td>
+					<td style="text-align:center"><?php echo $tnat[65] ; ?></td>
+					<td style="text-align:center"><?php echo $tnat[68] ; ?></td>
+					<td style="text-align:center"><?php echo $tnat[71] ; ?></td>
 					</tr>
 					</tbody>
 					</table>
@@ -725,8 +924,7 @@ elseif (($filter==4) || ($filter==3)) //month/year filter
 	<script src="../admin/neon/neon-x/assets/js/joinable.js" id="script-resource-4"></script>
 	<script src="../admin/neon/neon-x/assets/js/resizeable.js" id="script-resource-5"></script>
 	<script src="../admin/neon/neon-x/assets/js/neon-api.js" id="script-resource-6"></script>
-	<script src="../admin/neon/neon-x/assets/js/jquery.dataTables.min.js" id="script-resource-7"></script>
-	<script src="../admin/neon/neon-x/assets/js/dataTables.bootstrap.js" id="script-resource-8"></script>
+		<script src="../admin/neon/neon-x/assets/js/dataTables.bootstrap.js" id="script-resource-8"></script>
 	<script src="../admin/neon/neon-x/assets/js/select2/select2.min.js" id="script-resource-9"></script>
 	<script src="../admin/neon/neon-x/assets/js/neon-chat.js" id="script-resource-10"></script>
 	<script src="../admin/neon/neon-x/assets/js/neon-custom.js" id="script-resource-11"></script>
